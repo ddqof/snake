@@ -17,11 +17,12 @@ class Master(tk.Canvas):
                        snake_components.Block(BLOCK_SIZE, BLOCK_SIZE, self)]
         self.snake = snake_components.Snake(self.blocks, self)
         self.bind("<KeyPress>", self.snake.key_handle)
+        self.IN_GAME = True
 
-    def play_game(self):
+    def play(self):
         self.snake.move()
-        if self.snake.IN_GAME:
-            self.root.after(int(1 / SNAKE_SPEED * 1000), self.play_game)
+        if self.IN_GAME:
+            self.root.after(int(1 / SNAKE_SPEED * 1000), self.play)
 
     def create_eat(self):
         x1 = BLOCK_SIZE * random.randint(1, BLOCK_SIZE * ((WIDTH / BLOCK_SIZE ** 2) - 1))
@@ -30,6 +31,12 @@ class Master(tk.Canvas):
         y2 = y1 + BLOCK_SIZE
         eat = self.create_oval(x1, y1, x2, y2, fill="red")
         return eat
+
+    def finish_the_game(self):
+        self.IN_GAME = False
+        self.create_text(WIDTH / 2, HEIGHT / 2, text="Game Over",
+                         justify=tk.CENTER, font="Verdana 18",
+                         fill="white")
 
 
 def main():
@@ -41,7 +48,7 @@ def main():
     game_engine = Master(root, width=WIDTH, height=HEIGHT, bg="black")
     game_engine.pack()
     game_engine.focus_set()
-    game_engine.play_game()
+    game_engine.play()
 
     root.mainloop()
 
