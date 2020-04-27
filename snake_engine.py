@@ -37,11 +37,7 @@ class Master(tk.Canvas):
         if eat not in block_coords.values():
             self.eat = self.create_oval(eat[0], eat[1], eat[2], eat[3], fill="red")
         else:
-            print('popal')
             self.create_eat()
-
-        # TODO: нужно как-то перепроверять постоянно координаты всей змейки, то есть содержится ли координаты сгенерированной еды в змейке
-
         return eat
 
     def finish_the_game(self):
