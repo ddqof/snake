@@ -55,13 +55,12 @@ class Snake:
                     self.master.finish_the_game()
 
     def check_eat(self):
-        if len(self.master.coords(self.master.eat)) != 0:
-            if self.master.coords(self.blocks[0].image) == self.master.coords(self.master.eat):
-                self.master.delete(self.master.eat)
-                self.blocks.append(Block(self.master.coords(self.blocks[-1].image)[0] * self.vector.x,
-                                         self.master.coords(self.blocks[-1].image)[1] * self.vector.y,
-                                         self.master))
-                self.master.eat = self.master.create_eat()
+        if self.master.coords(self.blocks[0].image) == self.master.coords(self.master.eat):
+            self.master.delete(self.master.eat)
+            self.blocks.append(Block(self.master.coords(self.blocks[-1].image)[0] * self.vector.x,
+                                     self.master.coords(self.blocks[-1].image)[1] * self.vector.y,
+                                     self.master))
+            self.master.create_eat()
 
     def check_walls(self):
         if (self.master.coords(self.blocks[0].image)[2] > WIDTH or
@@ -74,19 +73,15 @@ class Snake:
         if event.keycode == 83 or event.keycode == 40:
             if self.vector.y == 0 and self.master.IN_GAME:
                 self.vector = Vector(0, 1)
-                self.move()
 
         if event.keycode == 87 or event.keycode == 38:
             if self.vector.y == 0 and self.master.IN_GAME:
                 self.vector = Vector(0, -1)
-                self.move()
 
         if event.keycode == 68 or event.keycode == 39:
             if self.vector.x == 0 and self.master.IN_GAME:
                 self.vector = Vector(1, 0)
-                self.move()
 
         if event.keycode == 65 or event.keycode == 37:
             if self.vector.x == 0 and self.master.IN_GAME:
                 self.vector = Vector(-1, 0)
-                self.move()

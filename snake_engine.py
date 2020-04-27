@@ -11,11 +11,12 @@ class Master(tk.Canvas):
     def __init__(self, root, **kwargs):
         super(Master, self).__init__(root, kwargs)
         self.root = root
-        self.eat = self.create_eat()
         self.blocks = [snake_components.Block(BLOCK_SIZE * 3, BLOCK_SIZE, self),
                        snake_components.Block(BLOCK_SIZE * 2, BLOCK_SIZE, self),
                        snake_components.Block(BLOCK_SIZE, BLOCK_SIZE, self)]
         self.snake = snake_components.Snake(self.blocks, self)
+        self.eat = 0
+        self.create_eat()
         self.bind("<KeyPress>", self.snake.key_handle)
         self.IN_GAME = True
 
@@ -24,12 +25,23 @@ class Master(tk.Canvas):
         if self.IN_GAME:
             self.root.after(int(1 / SNAKE_SPEED * 1000), self.play)
 
-    def create_eat(self):
-        x1 = BLOCK_SIZE * random.randint(1, BLOCK_SIZE * ((WIDTH / BLOCK_SIZE ** 2) - 1))
-        y1 = BLOCK_SIZE * random.randint(1, (HEIGHT * BLOCK_SIZE) / (BLOCK_SIZE ** 2) - BLOCK_SIZE)
-        x2 = x1 + BLOCK_SIZE
-        y2 = y1 + BLOCK_SIZE
-        eat = self.create_oval(x1, y1, x2, y2, fill="red")
+    def create_eat(self):  # тест несколько раз еда может попасть на змейку
+        block_coords = {}
+        eat_x1 = BLOCK_SIZE * random.randint(1, BLOCK_SIZE * ((WIDTH / BLOCK_SIZE ** 2) - 1))
+        eat_y1 = BLOCK_SIZE * random.randint(1, (HEIGHT * BLOCK_SIZE) / (BLOCK_SIZE ** 2) - BLOCK_SIZE)
+        eat_x2 = eat_x1 + BLOCK_SIZE
+        eat_y2 = eat_y1 + BLOCK_SIZE
+        eat = (eat_x1, eat_y1, eat_x2, eat_y2)
+        for index in range(len(self.blocks)):
+            block_coords[index] = tuple(self.coords(self.blocks[index].image))
+        if eat not in block_coords.values():
+            self.eat = self.create_oval(eat[0], eat[1], eat[2], eat[3], fill="red")
+        else:
+            print('popal')
+            self.create_eat()
+
+        # TODO: нужно как-то перепроверять постоянно координаты всей змейки, то есть содержится ли координаты сгенерированной еды в змейке
+
         return eat
 
     def finish_the_game(self):
