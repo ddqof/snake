@@ -25,7 +25,7 @@ class Master(tk.Canvas):
         if self.IN_GAME:
             self.root.after(int(1 / SNAKE_SPEED * 1000), self.play)
 
-    def create_eat(self):  # тест несколько раз еда может попасть на змейку
+    def create_eat(self):
         block_coords = {}
         eat_x1 = BLOCK_SIZE * random.randint(1, BLOCK_SIZE * ((WIDTH / BLOCK_SIZE ** 2) - 1))
         eat_y1 = BLOCK_SIZE * random.randint(1, (HEIGHT * BLOCK_SIZE) / (BLOCK_SIZE ** 2) - BLOCK_SIZE)
@@ -38,7 +38,6 @@ class Master(tk.Canvas):
             self.eat = self.create_oval(eat[0], eat[1], eat[2], eat[3], fill="red")
         else:
             self.create_eat()
-        return eat
 
     def finish_the_game(self):
         self.IN_GAME = False

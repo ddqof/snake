@@ -1,4 +1,6 @@
+# WIDTH and HEIGHT must contain to square of BLOCK_SIZE
+
 WIDTH = 800
 HEIGHT = 600
 BLOCK_SIZE = 20
-SNAKE_SPEED = 10
+SNAKE_SPEED = 15

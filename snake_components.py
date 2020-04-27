@@ -41,7 +41,6 @@ class Snake:
                            x2 + self.vector.x * BLOCK_SIZE,
                            y2 + self.vector.y * BLOCK_SIZE)
         self.check_obstacles()
-        # TODO: fix strange blocks adding and eat's spawn on snake
 
     def check_obstacles(self):
         self.check_self_eating()
@@ -57,8 +56,8 @@ class Snake:
     def check_eat(self):
         if self.master.coords(self.blocks[0].image) == self.master.coords(self.master.eat):
             self.master.delete(self.master.eat)
-            self.blocks.append(Block(self.master.coords(self.blocks[-1].image)[0] * self.vector.x,
-                                     self.master.coords(self.blocks[-1].image)[1] * self.vector.y,
+            self.blocks.append(Block(self.master.coords(self.blocks[-1].image)[0],
+                                     self.master.coords(self.blocks[-1].image)[1],
                                      self.master))
             self.master.create_eat()
 
