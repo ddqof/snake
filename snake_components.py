@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-import snake_engine
-import tkinter as tk
+
 from config import WIDTH, HEIGHT, BLOCK_SIZE
 
 

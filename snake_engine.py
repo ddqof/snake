@@ -50,7 +50,7 @@ class Master(tk.Canvas):
             text="Game Over\nPress 'Enter' or 'r' button to restart",
             justify=tk.CENTER, font="Verdana {}".format(
                 int(WIDTH / BLOCK_SIZE / 2)),
-            fill="white")
+            fill="cyan")
 
     def key_handle(self, event):
         if event.keycode == 83 or event.keycode == 40:
@@ -69,14 +69,13 @@ class Master(tk.Canvas):
             if self.snake.vector.x == 0 and self.IN_GAME:
                 self.snake.vector = snake_components.Vector(-1, 0)
 
-        if event.keycode == 13 or event.keycode == 82 and not self.IN_GAME:
+        if (event.keycode == 13 or event.keycode == 82) and not self.IN_GAME:
             self.delete("all")
             self.blocks = [
                 snake_components.Block(BLOCK_SIZE * 3, BLOCK_SIZE, self),
                 snake_components.Block(BLOCK_SIZE * 2, BLOCK_SIZE, self),
                 snake_components.Block(BLOCK_SIZE, BLOCK_SIZE, self)]
             self.snake = snake_components.Snake(self.blocks, self)
-            self.food = 0
             self.create_food()
             self.IN_GAME = True
             self.play()
