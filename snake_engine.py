@@ -53,23 +53,24 @@ class Master(tk.Canvas):
             fill="cyan")
 
     def key_handle(self, event):
-        if event.keycode == 83 or event.keycode == 40:
+        key = event.keysym
+        if key == 's' or key == 'Down':
             if self.snake.vector.y == 0 and self.IN_GAME:
                 self.snake.vector = snake_components.Vector(0, 1)
 
-        if event.keycode == 87 or event.keycode == 38:
+        if key == 'w' or key == 'Up':
             if self.snake.vector.y == 0 and self.IN_GAME:
                 self.snake.vector = snake_components.Vector(0, -1)
 
-        if event.keycode == 68 or event.keycode == 39:
+        if key == 'd' or key == 'Right':
             if self.snake.vector.x == 0 and self.IN_GAME:
                 self.snake.vector = snake_components.Vector(1, 0)
 
-        if event.keycode == 65 or event.keycode == 37:
+        if key == 'a' or key == 'Left':
             if self.snake.vector.x == 0 and self.IN_GAME:
                 self.snake.vector = snake_components.Vector(-1, 0)
 
-        if (event.keycode == 13 or event.keycode == 82) and not self.IN_GAME:
+        if (key == 'r' or key == 'Return') and not self.IN_GAME:
             self.delete("all")
             self.blocks = [
                 snake_components.Block(BLOCK_SIZE * 3, BLOCK_SIZE, self),
