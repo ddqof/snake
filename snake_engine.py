@@ -8,6 +8,7 @@ from config import SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT
 
 
 class Master(tk.Canvas):
+    """Компонент «игровое поле»"""
     def __init__(self, root, **kwargs):
         super(Master, self).__init__(root, kwargs)
         self.root = root
@@ -28,11 +29,15 @@ class Master(tk.Canvas):
         self.in_game = True
 
     def play(self):
+        """Запуск игрового процесса"""
+
         self.snake.move()
         if self.in_game:
             self.root.after(int(1 / SNAKE_SPEED * 1000), self.play)
 
     def create_food(self):
+        """Создание еды для змейки"""
+
         block_coords = {}
         food_x1 = BLOCK_SIZE * random.randint(
             1, BLOCK_SIZE * ((WIDTH / BLOCK_SIZE ** 2) - 1))
@@ -50,6 +55,8 @@ class Master(tk.Canvas):
             self.create_food()
 
     def finish_the_game(self):
+        """Остановка и завершение игры"""
+
         self.in_game = False
         self.create_text(
             WIDTH / 2, HEIGHT / 2,
@@ -59,6 +66,8 @@ class Master(tk.Canvas):
             fill="cyan")
 
     def restart_the_game(self):
+        """Перезаупуск игры"""
+
         self.delete("all")
         self.score = 0
         self.update_text()
@@ -72,16 +81,22 @@ class Master(tk.Canvas):
         self.play()
 
     def update_text(self):
+        """Обновление текста игровых очков"""
+
         self.label.configure(text="Score: {0}\n"
                                   "High Score: {1}".format(self.score, self.high_score),
                              width=12, height=10)
 
     def update_score(self):
+        """Обновление игровых очков"""
+
         self.score = self.score + 1
         if self.score > self.high_score:
             self.high_score = self.high_score + 1
 
     def key_handle(self, event):
+        """Обработка нажатий на клавиши"""
+
         key = event.keysym
         if key == 's' or key == 'Down':
             if self.snake.vector.y == 0 and self.in_game:
@@ -104,7 +119,7 @@ class Master(tk.Canvas):
 
 
 def main():
-    """Запуск игрового процесса"""
+    """Подготовка к запуску игрового процесса"""
 
     parse_args()
     root = tk.Tk()
