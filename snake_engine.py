@@ -18,12 +18,18 @@ class Master(tk.Canvas):
         self.snake = snake_components.Snake(self.blocks, self)
         self.food = 0
         self.create_food()
+        self.score = 0
+        self.high_score = 0
+        self.label = tk.Label(text="Score: {0}\n"
+                                   "High Score: {1}".format(self.score, self.high_score),
+                              width=12, height=10)
+        self.label.pack(side=tk.LEFT)
         self.bind("<KeyPress>", self.key_handle)
-        self.IN_GAME = True
+        self.in_game = True
 
     def play(self):
         self.snake.move()
-        if self.IN_GAME:
+        if self.in_game:
             self.root.after(int(1 / SNAKE_SPEED * 1000), self.play)
 
     def create_food(self):
@@ -44,42 +50,57 @@ class Master(tk.Canvas):
             self.create_food()
 
     def finish_the_game(self):
-        self.IN_GAME = False
+        self.in_game = False
         self.create_text(
             WIDTH / 2, HEIGHT / 2,
-            text="Game Over\nPress 'Enter' or 'r' button to restart",
+            text="Game Over\nPress 'Enter' or 'Space' button to restart",
             justify=tk.CENTER, font="Verdana {}".format(
                 int(WIDTH / BLOCK_SIZE / 2)),
             fill="cyan")
 
+    def restart_the_game(self):
+        self.delete("all")
+        self.score = 0
+        self.update_text()
+        self.blocks = [
+            snake_components.Block(BLOCK_SIZE * 3, BLOCK_SIZE, self),
+            snake_components.Block(BLOCK_SIZE * 2, BLOCK_SIZE, self),
+            snake_components.Block(BLOCK_SIZE, BLOCK_SIZE, self)]
+        self.snake = snake_components.Snake(self.blocks, self)
+        self.create_food()
+        self.in_game = True
+        self.play()
+
+    def update_text(self):
+        self.label.configure(text="Score: {0}\n"
+                                  "High Score: {1}".format(self.score, self.high_score),
+                             width=12, height=10)
+
+    def update_score(self):
+        self.score = self.score + 1
+        if self.score > self.high_score:
+            self.high_score = self.high_score + 1
+
     def key_handle(self, event):
         key = event.keysym
         if key == 's' or key == 'Down':
-            if self.snake.vector.y == 0 and self.IN_GAME:
+            if self.snake.vector.y == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(0, 1)
 
         if key == 'w' or key == 'Up':
-            if self.snake.vector.y == 0 and self.IN_GAME:
+            if self.snake.vector.y == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(0, -1)
 
         if key == 'd' or key == 'Right':
-            if self.snake.vector.x == 0 and self.IN_GAME:
+            if self.snake.vector.x == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(1, 0)
 
         if key == 'a' or key == 'Left':
-            if self.snake.vector.x == 0 and self.IN_GAME:
+            if self.snake.vector.x == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(-1, 0)
 
-        if (key == 'r' or key == 'Return') and not self.IN_GAME:
-            self.delete("all")
-            self.blocks = [
-                snake_components.Block(BLOCK_SIZE * 3, BLOCK_SIZE, self),
-                snake_components.Block(BLOCK_SIZE * 2, BLOCK_SIZE, self),
-                snake_components.Block(BLOCK_SIZE, BLOCK_SIZE, self)]
-            self.snake = snake_components.Snake(self.blocks, self)
-            self.create_food()
-            self.IN_GAME = True
-            self.play()
+        if (key == 'space' or key == 'Return') and not self.in_game:
+            self.restart_the_game()
 
 
 def main():

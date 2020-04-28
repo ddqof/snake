@@ -57,6 +57,8 @@ class Snake:
     def check_eat(self):
         if (self.master.coords(self.blocks[0].image) ==
                 self.master.coords(self.master.food)):
+            self.master.update_score()
+            self.master.update_text()
             self.master.delete(self.master.food)
             self.blocks.append(
                 Block(self.master.coords(self.blocks[-1].image)[0],
