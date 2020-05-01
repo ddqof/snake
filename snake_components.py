@@ -52,16 +52,15 @@ class Snake:
         self.check_walls()
 
     def check_self_eating(self):
-        """Проверка столкновения какого-либо блока змейки с другим блоком"""
+        """Проверка столкновения змейки с самой собой"""
 
-        for i in range(len(self.blocks) - 1):
-            for j in range(1, len(self.blocks)):
-                if (i != j and self.master.coords(self.blocks[i].image) ==
-                        self.master.coords(self.blocks[j].image)):
-                    self.master.finish_the_game()
+        for i in range(1, len(self.blocks)):
+            if (self.master.coords(self.blocks[0].image) ==
+                    self.master.coords(self.blocks[i].image)):
+                self.master.finish_the_game()
 
     def check_eat(self):
-        """Проверка содержание еды по координатам «головы» змейки"""
+        """Обработка встречи еды"""
 
         if (self.master.coords(self.blocks[0].image) ==
                 self.master.coords(self.master.food)):
