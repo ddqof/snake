@@ -9,13 +9,14 @@ from config import SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT, DEFAULT_FOOD_PROBABIL
     SPEED_UP_PROBABILITY
 
 
-# TODO: добавить уровни и еду
+# TODO: добавить уровни
 
 class Master(tk.Canvas):
     """Компонент «двигатель игры»"""
 
-    def __init__(self, root, **kwargs):
+    def __init__(self, vanilla_flag, root, **kwargs):
         super(Master, self).__init__(root, kwargs)
+        self.vanilla = vanilla_flag
         self.root = root
         self.blocks = [
             snake_components.Block(BLOCK_SIZE * 3, BLOCK_SIZE, self),
@@ -27,9 +28,12 @@ class Master(tk.Canvas):
         self.start_speed_up_time = 0
         self.food = self.Food()
         self.food_types = {0: 'red', 1: 'green', 2: 'cyan'}
-        self.create_food(random.choices((list(self.food_types.values())),
-                                        weights=[DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY,
-                                                 SPEED_UP_PROBABILITY]))
+        if self.vanilla:
+            self.create_food(['red'])
+        else:
+            self.create_food(random.choices((list(self.food_types.values())),
+                                            weights=[DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY,
+                                                     SPEED_UP_PROBABILITY]))
         self.score = 0
         self.high_score = 0
         self.label = tk.Label(text="Score: {0}\n"
@@ -51,7 +55,6 @@ class Master(tk.Canvas):
 
         self.snake.move()
         if self.start_speed_up_time != 0:
-            print(int(time.perf_counter() - self.start_speed_up_time))
             if int(time.perf_counter() - self.start_speed_up_time) == 3:
                 self.current_update_freq = self.default_update_freq
         if self.in_game:
@@ -101,9 +104,12 @@ class Master(tk.Canvas):
             snake_components.Block(BLOCK_SIZE * 2, BLOCK_SIZE, self),
             snake_components.Block(BLOCK_SIZE, BLOCK_SIZE, self)]
         self.snake = snake_components.Snake(self.blocks, self)
-        self.create_food(random.choices(list(self.food_types.values()),
-                                        weights=[DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY,
-                                                 SPEED_UP_PROBABILITY]))
+        if self.vanilla:
+            self.create_food(['red'])
+        else:
+            self.create_food(random.choices(list(self.food_types.values()),
+                                            weights=[DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY,
+                                                     SPEED_UP_PROBABILITY]))
         self.in_game = True
         self.play()
 
@@ -149,10 +155,10 @@ class Master(tk.Canvas):
 def main():
     """Подготовка к запуску игрового процесса"""
 
-    parse_args()
+    args = parse_args()
     root = tk.Tk()
     root.title("Snake")
-    game_engine = Master(root, width=WIDTH, height=HEIGHT, bg="black")
+    game_engine = Master(args.vanilla, root, width=WIDTH, height=HEIGHT, bg="black")
     game_engine.pack()
     game_engine.focus_set()
     game_engine.play()
@@ -169,6 +175,7 @@ def parse_args():
         control the snake.''',
         epilog='''Author: Dmitry Podaruev <ddqof.vvv@gmail.com>'''
     )
+    parser.add_argument("--vanilla", help='launch vanilla version of game', action='store_true')
     return parser.parse_args()
 
 
