@@ -2,8 +2,10 @@
 
 import time
 import random
-import configparser
-from config import WIDTH, HEIGHT, BLOCK_SIZE, DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY, SPEED_UP_PROBABILITY
+from config import (WIDTH, HEIGHT, BLOCK_SIZE,
+                    DEFAULT_FOOD_PROBABILITY,
+                    DOUBLE_LENGTH_PROBABILITY,
+                    SPEED_UP_PROBABILITY)
 
 
 class Vector:
@@ -78,19 +80,22 @@ class Snake:
             if self.master.food.type == 'green':
                 self.master.update_score(self.master.score)
                 for i in range(len(self.blocks)):
-                    self.blocks.append(Block(self.master.coords(self.blocks[-1].image)[0],
-                                             self.master.coords(self.blocks[-1].image)[1],
-                                             self.master))
+                    self.blocks.append(
+                        Block(self.master.coords(self.blocks[-1].image)[0],
+                              self.master.coords(self.blocks[-1].image)[1],
+                              self.master))
             if self.master.food.type == 'cyan':
                 self.master.update_score(1)
-                self.master.current_update_freq = self.master.current_update_freq / 2
+                self.master.current_update_freq /= 2
                 self.master.start_speed_up_time = time.perf_counter()
             if self.master.vanilla:
                 self.master.create_food(['red'])
             else:
-                self.master.create_food(random.choices(list(self.master.food_types.values()),
-                                                       weights=[DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY,
-                                                                SPEED_UP_PROBABILITY]))
+                self.master.create_food(random.choices(
+                    list(self.master.food_types.values()),
+                    weights=[DEFAULT_FOOD_PROBABILITY,
+                             DOUBLE_LENGTH_PROBABILITY,
+                             SPEED_UP_PROBABILITY]))
 
     def check_walls(self):
         """Проверка на столкновение змейки со стеной"""

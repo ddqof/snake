@@ -5,11 +5,13 @@ import tkinter as tk
 import snake_components
 import argparse
 import random
-from config import SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT, DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY, \
-    SPEED_UP_PROBABILITY
+from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
+                    DEFAULT_FOOD_PROBABILITY,
+                    DOUBLE_LENGTH_PROBABILITY,
+                    SPEED_UP_PROBABILITY)
 
 
-# TODO: добавить уровни
+# TODO: добавить уровни, пофиксить зеленую еду
 
 class Master(tk.Canvas):
     """Компонент «двигатель игры»"""
@@ -32,12 +34,13 @@ class Master(tk.Canvas):
             self.create_food(['red'])
         else:
             self.create_food(random.choices((list(self.food_types.values())),
-                                            weights=[DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY,
+                                            weights=[DEFAULT_FOOD_PROBABILITY,
+                                                     DOUBLE_LENGTH_PROBABILITY,
                                                      SPEED_UP_PROBABILITY]))
         self.score = 0
         self.high_score = 0
-        self.label = tk.Label(text="Score: {0}\n"
-                                   "High Score: {1}".format(self.score, self.high_score),
+        self.label = tk.Label(text="Score: {0}\nHigh Score: {1}"
+                              .format(self.score, self.high_score),
                               width=12, height=10)
         self.label.pack(side=tk.LEFT)
         self.bind("<KeyPress>", self.key_handle)
@@ -75,8 +78,8 @@ class Master(tk.Canvas):
             block_coords[index] = tuple(self.coords(self.blocks[index].image))
         if food not in block_coords.values():
             self.food.type = food_colour[0]
-            self.food.image = self.create_oval(food[0], food[1], food[2], food[3],
-                                               fill=self.food.type)
+            self.food.image = self.create_oval(
+                food[0], food[1], food[2], food[3], fill=self.food.type)
         else:
             self.create_food(food_colour)
 
@@ -108,7 +111,8 @@ class Master(tk.Canvas):
             self.create_food(['red'])
         else:
             self.create_food(random.choices(list(self.food_types.values()),
-                                            weights=[DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY,
+                                            weights=[DEFAULT_FOOD_PROBABILITY,
+                                                     DOUBLE_LENGTH_PROBABILITY,
                                                      SPEED_UP_PROBABILITY]))
         self.in_game = True
         self.play()
@@ -116,8 +120,8 @@ class Master(tk.Canvas):
     def update_text(self):
         """Обновление текста игровых очков"""
 
-        self.label.configure(text="Score: {0}\n"
-                                  "High Score: {1}".format(self.score, self.high_score),
+        self.label.configure(text="Score: {0}\nHigh Score: {1}"
+                             .format(self.score, self.high_score),
                              width=12, height=10)
 
     def update_score(self, score):
@@ -158,7 +162,8 @@ def main():
     args = parse_args()
     root = tk.Tk()
     root.title("Snake")
-    game_engine = Master(args.vanilla, root, width=WIDTH, height=HEIGHT, bg="black")
+    game_engine = Master(args.vanilla, root,
+                         width=WIDTH, height=HEIGHT, bg="black")
     game_engine.pack()
     game_engine.focus_set()
     game_engine.play()
@@ -175,7 +180,9 @@ def parse_args():
         control the snake.''',
         epilog='''Author: Dmitry Podaruev <ddqof.vvv@gmail.com>'''
     )
-    parser.add_argument("--vanilla", help='launch vanilla version of game', action='store_true')
+    parser.add_argument("--vanilla",
+                        help='launch vanilla version of game',
+                        action='store_true')
     return parser.parse_args()
 
 
