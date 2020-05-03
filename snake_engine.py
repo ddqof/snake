@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 
+import time
 import tkinter as tk
 import snake_components
 import argparse
 import random
-from config import SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT
+from config import SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT, DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY, \
+    SPEED_UP_PROBABILITY
 
+
+# TODO: добавить уровни и еду
 
 class Master(tk.Canvas):
-    """Компонент «игровое поле»"""
+    """Компонент «двигатель игры»"""
+
     def __init__(self, root, **kwargs):
         super(Master, self).__init__(root, kwargs)
         self.root = root
@@ -17,8 +22,14 @@ class Master(tk.Canvas):
             snake_components.Block(BLOCK_SIZE * 2, BLOCK_SIZE, self),
             snake_components.Block(BLOCK_SIZE, BLOCK_SIZE, self)]
         self.snake = snake_components.Snake(self.blocks, self)
-        self.food = 0
-        self.create_food()
+        self.default_update_freq = int(1 / SNAKE_SPEED * 1000)
+        self.current_update_freq = self.default_update_freq
+        self.start_speed_up_time = 0
+        self.food = self.Food()
+        self.food_types = {0: 'red', 1: 'green', 2: 'cyan'}
+        self.create_food(random.choices((list(self.food_types.values())),
+                                        weights=[DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY,
+                                                 SPEED_UP_PROBABILITY]))
         self.score = 0
         self.high_score = 0
         self.label = tk.Label(text="Score: {0}\n"
@@ -28,14 +39,25 @@ class Master(tk.Canvas):
         self.bind("<KeyPress>", self.key_handle)
         self.in_game = True
 
+    class Food:
+        """Компонент «еда змейки»"""
+
+        def __init__(self):
+            self.type = None
+            self.image = None
+
     def play(self):
         """Запуск игрового процесса"""
 
         self.snake.move()
+        if self.start_speed_up_time != 0:
+            print(int(time.perf_counter() - self.start_speed_up_time))
+            if int(time.perf_counter() - self.start_speed_up_time) == 3:
+                self.current_update_freq = self.default_update_freq
         if self.in_game:
-            self.root.after(int(1 / SNAKE_SPEED * 1000), self.play)
+            self.root.after(int(self.current_update_freq), self.play)
 
-    def create_food(self):
+    def create_food(self, food_colour):
         """Создание еды для змейки"""
 
         block_coords = {}
@@ -49,10 +71,11 @@ class Master(tk.Canvas):
         for index in range(len(self.blocks)):
             block_coords[index] = tuple(self.coords(self.blocks[index].image))
         if food not in block_coords.values():
-            self.food = self.create_oval(food[0], food[1], food[2], food[3],
-                                         fill="red")
+            self.food.type = food_colour[0]
+            self.food.image = self.create_oval(food[0], food[1], food[2], food[3],
+                                               fill=self.food.type)
         else:
-            self.create_food()
+            self.create_food(food_colour)
 
     def finish_the_game(self):
         """Остановка и завершение игры"""
@@ -69,6 +92,8 @@ class Master(tk.Canvas):
         """Перезаупуск игры"""
 
         self.delete("all")
+        self.start_speed_up_time = 0
+        self.current_update_freq = self.default_update_freq
         self.score = 0
         self.update_text()
         self.blocks = [
@@ -76,7 +101,9 @@ class Master(tk.Canvas):
             snake_components.Block(BLOCK_SIZE * 2, BLOCK_SIZE, self),
             snake_components.Block(BLOCK_SIZE, BLOCK_SIZE, self)]
         self.snake = snake_components.Snake(self.blocks, self)
-        self.create_food()
+        self.create_food(random.choices(list(self.food_types.values()),
+                                        weights=[DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY,
+                                                 SPEED_UP_PROBABILITY]))
         self.in_game = True
         self.play()
 
@@ -87,12 +114,13 @@ class Master(tk.Canvas):
                                   "High Score: {1}".format(self.score, self.high_score),
                              width=12, height=10)
 
-    def update_score(self):
+    def update_score(self, score):
         """Обновление игровых очков"""
 
-        self.score = self.score + 1
+        self.score = self.score + score
         if self.score > self.high_score:
-            self.high_score = self.high_score + 1
+            self.high_score = self.high_score + score
+        self.update_text()
 
     def key_handle(self, event):
         """Обработка нажатий на клавиши"""

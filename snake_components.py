@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-from config import WIDTH, HEIGHT, BLOCK_SIZE
+import time
+import random
+from config import WIDTH, HEIGHT, BLOCK_SIZE, DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY, SPEED_UP_PROBABILITY
 
 
 class Vector:
@@ -48,8 +50,9 @@ class Snake:
         """Проверка встречи всевозможных препятствий при движении"""
 
         self.check_self_eating()
-        self.check_eat()
-        self.check_walls()
+        if self.master.in_game:
+            self.check_eat()
+            self.check_walls()
 
     def check_self_eating(self):
         """Проверка столкновения змейки с самой собой"""
@@ -63,15 +66,28 @@ class Snake:
         """Обработка встречи еды"""
 
         if (self.master.coords(self.blocks[0].image) ==
-                self.master.coords(self.master.food)):
-            self.master.update_score()
-            self.master.update_text()
-            self.master.delete(self.master.food)
-            self.blocks.append(
-                Block(self.master.coords(self.blocks[-1].image)[0],
-                      self.master.coords(self.blocks[-1].image)[1],
-                      self.master))
-            self.master.create_food()
+                self.master.coords(self.master.food.image)):
+            self.master.delete(self.master.food.image)
+            if self.master.food.type == 'red':
+                self.master.update_score(1)
+                self.blocks.append(
+                    Block(self.master.coords(self.blocks[-1].image)[0],
+                          self.master.coords(self.blocks[-1].image)[1],
+                          self.master))
+            if self.master.food.type == 'green':
+                self.master.update_score(self.master.score)
+                for i in range(len(self.blocks)):
+                    self.blocks.append(Block(self.master.coords(self.blocks[-1].image)[0],
+                                             self.master.coords(self.blocks[-1].image)[1],
+                                             self.master))
+            if self.master.food.type == 'cyan':
+                self.master.update_score(1)
+                self.master.current_update_freq = self.master.current_update_freq / 2
+                self.master.start_speed_up_time = time.perf_counter()
+
+            self.master.create_food(random.choices(list(self.master.food_types.values()),
+                                                   weights=[DEFAULT_FOOD_PROBABILITY, DOUBLE_LENGTH_PROBABILITY,
+                                                            SPEED_UP_PROBABILITY]))
 
     def check_walls(self):
         """Проверка на столкновение змейки со стеной"""
