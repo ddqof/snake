@@ -8,10 +8,11 @@ import random
 from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
                     DEFAULT_FOOD_PROBABILITY,
                     DOUBLE_LENGTH_PROBABILITY,
-                    SPEED_UP_PROBABILITY)
+                    BOOST_PROBABILITY,
+                    REVERSE_PROBABILITY)
 
 
-# TODO: добавить уровни, пофиксить зеленую еду
+# TODO: добавить уровни
 
 class Master(tk.Canvas):
     """Компонент «двигатель игры»"""
@@ -29,14 +30,15 @@ class Master(tk.Canvas):
         self.current_update_freq = self.default_update_freq
         self.start_speed_up_time = 0
         self.food = self.Food()
-        self.food_types = {0: 'red', 1: 'green', 2: 'cyan'}
+        self.food_types = {0: 'red', 1: 'green', 2: 'cyan', 3: 'purple'}
         if self.vanilla:
             self.create_food(['red'])
         else:
             self.create_food(random.choices((list(self.food_types.values())),
                                             weights=[DEFAULT_FOOD_PROBABILITY,
                                                      DOUBLE_LENGTH_PROBABILITY,
-                                                     SPEED_UP_PROBABILITY]))
+                                                     BOOST_PROBABILITY,
+                                                     REVERSE_PROBABILITY]))
         self.score = 0
         self.high_score = 0
         self.label = tk.Label(text="Score: {0}\nHigh Score: {1}"
@@ -45,6 +47,7 @@ class Master(tk.Canvas):
         self.label.pack(side=tk.LEFT)
         self.bind("<KeyPress>", self.key_handle)
         self.in_game = True
+        self.timer = 0
 
     class Food:
         """Компонент «еда змейки»"""
@@ -113,7 +116,8 @@ class Master(tk.Canvas):
             self.create_food(random.choices(list(self.food_types.values()),
                                             weights=[DEFAULT_FOOD_PROBABILITY,
                                                      DOUBLE_LENGTH_PROBABILITY,
-                                                     SPEED_UP_PROBABILITY]))
+                                                     BOOST_PROBABILITY,
+                                                     REVERSE_PROBABILITY]))
         self.in_game = True
         self.play()
 
