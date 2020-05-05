@@ -14,11 +14,11 @@ from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
 
 # TODO: добавить уровни
 
-class Master(tk.Canvas):
+class Driver(tk.Canvas):
     """Компонент «двигатель игры»"""
 
     def __init__(self, vanilla_flag, root, **kwargs):
-        super(Master, self).__init__(root, kwargs)
+        super(Driver, self).__init__(root, kwargs)
         self.vanilla = vanilla_flag
         self.root = root
         self.blocks = [
@@ -47,8 +47,7 @@ class Master(tk.Canvas):
         self.label.pack(side=tk.LEFT)
         self.bind("<KeyPress>", self.key_handle)
         self.in_game = True
-        self.last_bind = 0
-        self.timer = 0
+        self.last_handled_vector = snake_components.Vector(1, 0)
 
     class Food:
         """Компонент «еда змейки»"""
@@ -142,19 +141,19 @@ class Master(tk.Canvas):
 
         key = event.keysym
         if key == 's' or key == 'Down':
-            if self.snake.vector.y == 0 and self.snake.last_vector.y == 0 and self.in_game:
+            if self.snake.last_handled_vector.y == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(0, 1)
 
         if key == 'w' or key == 'Up':
-            if self.snake.vector.y == 0 and self.snake.last_vector.y == 0 and self.in_game:
+            if self.snake.last_handled_vector.y == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(0, -1)
 
         if key == 'd' or key == 'Right':
-            if self.snake.vector.x == 0 and self.snake.last_vector.x == 0 and self.in_game:
+            if self.snake.last_handled_vector.x == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(1, 0)
 
         if key == 'a' or key == 'Left':
-            if self.snake.vector.x == 0 and self.snake.last_vector.x == 0 and self.in_game:
+            if self.snake.last_handled_vector.x == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(-1, 0)
 
         if (key == 'space' or key == 'Return') and not self.in_game:
@@ -167,7 +166,7 @@ def main():
     args = parse_args()
     root = tk.Tk()
     root.title("Snake")
-    game_engine = Master(args.vanilla, root,
+    game_engine = Driver(args.vanilla, root,
                          width=WIDTH, height=HEIGHT, bg="black")
     game_engine.pack()
     game_engine.focus_set()
