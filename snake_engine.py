@@ -47,6 +47,7 @@ class Master(tk.Canvas):
         self.label.pack(side=tk.LEFT)
         self.bind("<KeyPress>", self.key_handle)
         self.in_game = True
+        self.last_bind = 0
         self.timer = 0
 
     class Food:
@@ -141,19 +142,19 @@ class Master(tk.Canvas):
 
         key = event.keysym
         if key == 's' or key == 'Down':
-            if self.snake.vector.y == 0 and self.in_game:
+            if self.snake.vector.y == 0 and self.snake.last_vector.y == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(0, 1)
 
         if key == 'w' or key == 'Up':
-            if self.snake.vector.y == 0 and self.in_game:
+            if self.snake.vector.y == 0 and self.snake.last_vector.y == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(0, -1)
 
         if key == 'd' or key == 'Right':
-            if self.snake.vector.x == 0 and self.in_game:
+            if self.snake.vector.x == 0 and self.snake.last_vector.x == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(1, 0)
 
         if key == 'a' or key == 'Left':
-            if self.snake.vector.x == 0 and self.in_game:
+            if self.snake.vector.x == 0 and self.snake.last_vector.x == 0 and self.in_game:
                 self.snake.vector = snake_components.Vector(-1, 0)
 
         if (key == 'space' or key == 'Return') and not self.in_game:

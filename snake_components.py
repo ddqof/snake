@@ -34,10 +34,12 @@ class Snake:
         self.blocks = blocks
         self.master = canvas
         self.vector = Vector(1, 0)
+        self.last_vector = Vector(1, 0)
 
     def move(self):
         """Движение змейки"""
 
+        self.last_vector = self.vector
         for index in reversed(range(1, len(self.blocks))):
             block = self.blocks[index].image
             x1, y1, x2, y2 = self.master.coords(self.blocks[index - 1].image)
@@ -92,11 +94,10 @@ class Snake:
                 self.master.start_speed_up_time = time.perf_counter()
             if self.master.food.type == 'purple':
                 self.blocks.reverse()
-                if self.vector.x == 0:
-                    self.vector.y *= -1
-                if self.vector.y == 0:
-                    self.vector.x *= -1
-                self.master.start_speed_up_time = time.perf_counter()
+                # if self.vector.x == 0:
+                #     self.vector.y *= -1
+                # if self.vector.y == 0:
+                #     self.vector.x *= -1
                 self.master.update_score(2)
             if self.master.vanilla:
                 self.master.create_food(['red'])
