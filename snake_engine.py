@@ -17,7 +17,7 @@ from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
 class Driver(tk.Canvas):
     """Компонент «двигатель игры»"""
 
-    def __init__(self, vanilla_flag, root, **kwargs):
+    def __init__(self, lvl, vanilla_flag, root, **kwargs):
         super(Driver, self).__init__(root, kwargs)
         self.vanilla = vanilla_flag
         self.root = root
@@ -29,8 +29,10 @@ class Driver(tk.Canvas):
         self.default_update_freq = int(1 / SNAKE_SPEED * 1000)
         self.current_update_freq = self.default_update_freq
         self.start_speed_up_time = 0
-        self.food = self.Food()
+        self.level_walls = []
+        self.food = snake_components.Food()
         self.food_types = {0: 'red', 1: 'green', 2: 'cyan', 3: 'purple'}
+        self.level_walls = self.create_level(lvl)
         if self.vanilla:
             self.create_food(['red'])
         else:
@@ -49,13 +51,6 @@ class Driver(tk.Canvas):
         self.in_game = True
         self.last_handled_vector = snake_components.Vector(1, 0)
 
-    class Food:
-        """Компонент «еда змейки»"""
-
-        def __init__(self):
-            self.type = None
-            self.image = None
-
     def play(self):
         """Запуск игрового процесса"""
 
@@ -71,20 +66,56 @@ class Driver(tk.Canvas):
 
         block_coords = {}
         food_x1 = BLOCK_SIZE * random.randint(
-            1, BLOCK_SIZE * ((WIDTH / BLOCK_SIZE ** 2) - 1))
+            1, BLOCK_SIZE * (WIDTH / BLOCK_SIZE ** 2) - 2)
         food_y1 = BLOCK_SIZE * random.randint(
-            1, (HEIGHT * BLOCK_SIZE) / (BLOCK_SIZE ** 2) - BLOCK_SIZE)
+            1, BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2) - 2)
         food_x2 = food_x1 + BLOCK_SIZE
         food_y2 = food_y1 + BLOCK_SIZE
         food = (food_x1, food_y1, food_x2, food_y2)
-        for index in range(len(self.blocks)):
-            block_coords[index] = tuple(self.coords(self.blocks[index].image))
+        index = 0
+        for block in self.blocks:
+            block_coords[index] = tuple(self.coords(block.image))
+            index += 1
+        for lvl_block in self.level_walls:
+            block_coords[index] = tuple(self.coords(lvl_block))
         if food not in block_coords.values():
             self.food.type = food_colour[0]
             self.food.image = self.create_oval(
                 food[0], food[1], food[2], food[3], fill=self.food.type)
         else:
             self.create_food(food_colour)
+
+    def create_random_wall(self):
+        """Создание еды для змейки"""
+
+        walls_count = 0
+        level_walls_coords = []
+        while walls_count < 50:
+            block_coords = {}
+            wall_x1 = BLOCK_SIZE * random.randint(
+                1, BLOCK_SIZE * (WIDTH / BLOCK_SIZE ** 2) - 2)
+            wall_y1 = BLOCK_SIZE * random.randint(
+                1, BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2) - 2)
+            wall_x2 = wall_x1 + BLOCK_SIZE
+            wall_y2 = wall_y1 + BLOCK_SIZE
+            wall = (wall_x1, wall_y1, wall_x2, wall_y2)
+            for index in range(len(self.blocks)):
+                block_coords[index] = tuple(self.coords(self.blocks[index].image))
+            block_coords[len(self.blocks)] = tuple(self.coords(self.food))
+            if wall not in block_coords.values():
+                level_walls_coords.append(self.create_rectangle(
+                    wall[0], wall[1], wall[2], wall[3], fill='grey'))
+                walls_count += 1
+        return level_walls_coords
+
+    def create_level(self, lvl):
+        walls = []
+        if lvl == 1:
+            for i in range(40):
+                walls.append(self.create_rectangle(BLOCK_SIZE * i, 0, BLOCK_SIZE * (i + 1), BLOCK_SIZE, fill='gray'))
+        if lvl == 2:
+            walls = self.create_random_wall()
+        return walls
 
     def finish_the_game(self):
         """Остановка и завершение игры"""
@@ -118,6 +149,7 @@ class Driver(tk.Canvas):
                                                      DOUBLE_LENGTH_PROBABILITY,
                                                      BOOST_PROBABILITY,
                                                      REVERSE_PROBABILITY]))
+        self.level_walls = self.create_level(2)
         self.in_game = True
         self.play()
 
@@ -166,7 +198,7 @@ def main():
     args = parse_args()
     root = tk.Tk()
     root.title("Snake")
-    game_engine = Driver(args.vanilla, root,
+    game_engine = Driver(args.lvl, args.v, root,
                          width=WIDTH, height=HEIGHT, bg="black")
     game_engine.pack()
     game_engine.focus_set()
@@ -184,9 +216,13 @@ def parse_args():
         control the snake.''',
         epilog='''Author: Dmitry Podaruev <ddqof.vvv@gmail.com>'''
     )
-    parser.add_argument("--vanilla",
+    parser.add_argument('-v',
                         help='launch vanilla version of game',
                         action='store_true')
+    parser.add_argument('-lvl',
+                        type=int,
+                        help='select game level',
+                        default=0)
     return parser.parse_args()
 
 

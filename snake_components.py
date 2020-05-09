@@ -27,6 +27,14 @@ class Block:
                                              fill='white')
 
 
+class Food:
+    """Компонент «еда змейки»"""
+
+    def __init__(self):
+        self.type = None
+        self.image = None
+
+
 class Snake:
     """Компонент «змейка»"""
 
@@ -89,32 +97,36 @@ class Snake:
                               self.driver))
                 self.driver.update_score(self.driver.score)
             if self.driver.food.type == 'cyan':
-                self.driver.update_score(1)
+                self.driver.update_score(2)
                 self.driver.current_update_freq /= BOOST_COEFFICIENT
                 self.driver.start_speed_up_time = time.perf_counter()
             if self.driver.food.type == 'purple':
                 if (self.driver.coords(self.blocks[-1].image)[0] ==
                         self.driver.coords(self.blocks[-2].image)[0] and
                         self.driver.coords(self.blocks[-2].image)[1] ==
-                        self.driver.coords(self.blocks[-1].image)[1] - BLOCK_SIZE):
+                        self.driver.coords(
+                            self.blocks[-1].image)[1] - BLOCK_SIZE):
                     self.vector.y = 1
                     self.vector.x = 0
                 elif (self.driver.coords(self.blocks[-1].image)[0] ==
                       self.driver.coords(self.blocks[-2].image)[0] and
                       self.driver.coords(self.blocks[-2].image)[1] ==
-                      self.driver.coords(self.blocks[-1].image)[1] + BLOCK_SIZE):
+                      self.driver.coords(
+                          self.blocks[-1].image)[1] + BLOCK_SIZE):
                     self.vector.y = -1
                     self.vector.x = 0
                 elif (self.driver.coords(self.blocks[-1].image)[1] ==
                       self.driver.coords(self.blocks[-2].image)[1] and
                       self.driver.coords(self.blocks[-1].image)[0] ==
-                      self.driver.coords(self.blocks[-2].image)[0] - BLOCK_SIZE):
+                      self.driver.coords(
+                          self.blocks[-2].image)[0] - BLOCK_SIZE):
                     self.vector.y = 0
                     self.vector.x = -1
                 elif (self.driver.coords(self.blocks[-1].image)[1] ==
                       self.driver.coords(self.blocks[-2].image)[1] and
                       self.driver.coords(self.blocks[-1].image)[0] ==
-                      self.driver.coords(self.blocks[-2].image)[0] + BLOCK_SIZE):
+                      self.driver.coords(
+                          self.blocks[-2].image)[0] + BLOCK_SIZE):
                     self.vector.y = 0
                     self.vector.x = 1
                 self.blocks.reverse()
@@ -131,9 +143,13 @@ class Snake:
 
     def check_walls(self):
         """Проверка на столкновение змейки со стеной"""
-
+        # if self.driver.level == 0:
         if (self.driver.coords(self.blocks[0].image)[2] > WIDTH or
                 self.driver.coords(self.blocks[0].image)[0] < 0 or
                 self.driver.coords(self.blocks[0].image)[3] > HEIGHT or
                 self.driver.coords(self.blocks[0].image)[1] < 0):
             self.driver.finish_the_game()
+        else:
+            for obstacle in self.driver.level_walls:
+                if self.driver.coords(self.blocks[0].image) == self.driver.coords(obstacle):
+                    self.driver.finish_the_game()
