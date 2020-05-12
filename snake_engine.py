@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import time
 import snake_components
 import random
 from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
@@ -12,77 +13,65 @@ from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
 # TODO: добавить уровни
 
 class Driver:
-    """Компонент «двигатель игры»"""
+    """Компонент «контроллер игры»"""
 
     def __init__(self, lvl, vanilla_flag):
         self.vanilla = vanilla_flag
         self.snake = snake_components.Snake([
-            snake_components.Block(BLOCK_SIZE * 3, BLOCK_SIZE),
-            snake_components.Block(BLOCK_SIZE * 2, BLOCK_SIZE),
-            snake_components.Block(BLOCK_SIZE, BLOCK_SIZE)], self)
+            snake_components.Block(3, 1),
+            snake_components.Block(2, 1),
+            snake_components.Block(1, 1)], self)
+        self.map = []
+        for y in range(int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2))):
+            self.map.append([])
+            for x in range(int(BLOCK_SIZE * (WIDTH / BLOCK_SIZE ** 2))):
+                self.map[y].append(0)
         self.default_update_freq = int(1 / SNAKE_SPEED * 1000)
         self.current_update_freq = self.default_update_freq
         self.vector = snake_components.Vector(1, 0)
-        # self.start_speed_up_time = 0
+        self.boost_start_moment = 0
         # self.level_walls = []
         self.food = snake_components.Food()
-        self.food_types = {0: 'red', 1: 'green', 2: 'cyan', 3: 'purple'}
+        self.food_types = {5: 'red', 6: 'green', 7: 'cyan', 8: 'purple'}
         # self.level_walls = self.create_level(lvl)
         if self.vanilla:
-            self.get_food(['red'])
+            self.get_food([5])
         else:
-            self.get_food(random.choices((list(self.food_types.values())),
+            self.get_food(random.choices((list(self.food_types.keys())),
                                          weights=[DEFAULT_FOOD_PROBABILITY,
                                                   DOUBLE_LENGTH_PROBABILITY,
                                                   BOOST_PROBABILITY,
                                                   REVERSE_PROBABILITY]))
-        self.map = []
-        self.init_map()
         self.score = 0
         self.high_score = 0
         self.in_game = True
         self.last_handled_vector = snake_components.Vector(1, 0)
 
-    def init_map(self):
-        for y in range(int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2))):
-            self.map.append([])
-            for x in range(int(BLOCK_SIZE * (WIDTH / BLOCK_SIZE ** 2))):
-                self.map[y].append(0)
-
-        for y in range(len(self.map)):
-            for x in range(len(self.map[y])):
-                for block in self.snake.blocks:
-                    if (x, y) == block.map_coords:
-                        self.map[y][x] = 1
-
-        for row in self.map:
-            for x in row:
-                print("{:4d}".format(x), end="")
-            print()
-
-    def get_food(self, food_colour):
+    def get_food(self, food_type):
         """Создание еды для змейки"""
 
         block_coords = {}
-        food_x1 = BLOCK_SIZE * random.randint(
-            1, BLOCK_SIZE * (WIDTH / BLOCK_SIZE ** 2) - 2)
-        food_y1 = BLOCK_SIZE * random.randint(
-            1, BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2) - 2)
-        food_x2 = food_x1 + BLOCK_SIZE
-        food_y2 = food_y1 + BLOCK_SIZE
-        food = (food_x1, food_y1, food_x2, food_y2)
+        food_x = random.randint(1, BLOCK_SIZE * (WIDTH / BLOCK_SIZE ** 2) - 2)
+        food_y = random.randint(1, BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2) - 2)
+        food_coords = (food_x, food_y)
         index = 0
         for block in self.snake.blocks:
-            block_coords[index] = block.canvas_coords
+            block_coords[index] = block.map_coords
             index += 1
         # for lvl_block in self.level_walls:
         #     block_coords[index] = tuple(self.coords(lvl_block))
-        if food not in block_coords.values():
-            self.food.type = food_colour[0]
-            self.food.canvas_coords = (food[0], food[1], food[2], food[3])
-            self.food.map_coords = (food[0] / BLOCK_SIZE, food[1] / BLOCK_SIZE)
+        if food_coords not in block_coords.values():
+            self.food.map_coords = food_coords
+            self.food.type = food_type[0]
+            self.map[food_y][food_x] = food_type[0]
         else:
-            self.get_food(food_colour)
+            self.get_food(food_type)
+
+    def check_boost_time(self):
+        """Проверка истечения времени для ускорения"""
+        if self.boost_start_moment != 0:
+            if int(time.perf_counter() - self.boost_start_moment) == 3:
+                self.current_update_freq = self.default_update_freq
 
     # def create_random_wall(self):
     #     """Создание еды для змейки"""
@@ -116,53 +105,44 @@ class Driver:
     #         walls = self.create_random_wall()
     #     return walls
 
-    # def finish_the_game(self):
-    #     """Остановка и завершение игры"""
-    #
-    #     self.in_game = False
-    #     self.create_text(
-    #         WIDTH / 2, HEIGHT / 2,
-    #         text="Game Over\nPress 'Enter' or 'Space' button to restart",
-    #         justify=tk.CENTER, font="Verdana {}".format(
-    #             int(WIDTH / BLOCK_SIZE / 2)),
-    #         fill="cyan")
+    def restart_the_game(self):
+        """Перезаупуск игры"""
 
-    # def restart_the_game(self):
-    #     """Перезаупуск игры"""
-    #
-    #     self.delete("all")
-    #     self.start_speed_up_time = 0
-    #     self.current_update_freq = self.default_update_freq
-    #     self.score = 0
-    #     self.update_text()
-    #     self.blocks = [
-    #         snake_components.Block(BLOCK_SIZE * 3, BLOCK_SIZE, self),
-    #         snake_components.Block(BLOCK_SIZE * 2, BLOCK_SIZE, self),
-    #         snake_components.Block(BLOCK_SIZE, BLOCK_SIZE, self)]
-    #     self.snake = snake_components.Snake(self.blocks, self)
-    #     if self.vanilla:
-    #         self.create_food(['red'])
-    #     else:
-    #         self.create_food(random.choices(list(self.food_types.values()),
-    #                                         weights=[DEFAULT_FOOD_PROBABILITY,
-    #                                                  DOUBLE_LENGTH_PROBABILITY,
-    #                                                  BOOST_PROBABILITY,
-    #                                                  REVERSE_PROBABILITY]))
-    #     self.level_walls = self.create_level(2)
-    #     self.in_game = True
-    #     self.play()
+        for y in range(int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2))):
+            for x in range(int(BLOCK_SIZE * (WIDTH / BLOCK_SIZE ** 2))):
+                self.map[y][x] = 0
+        self.boost_start_moment = 0
+        self.current_update_freq = self.default_update_freq
+        self.score = 0
+        self.snake.blocks = [
+            snake_components.Block(3, 1),
+            snake_components.Block(2, 1),
+            snake_components.Block(1, 1)]
+        self.snake = snake_components.Snake(self.snake.blocks, self)
+        self.update_snake_state()
+        if self.vanilla:
+            self.get_food([5])
+        else:
+            self.get_food(random.choices(list(self.food_types.keys()),
+                                         weights=[DEFAULT_FOOD_PROBABILITY,
+                                                  DOUBLE_LENGTH_PROBABILITY,
+                                                  BOOST_PROBABILITY,
+                                                  REVERSE_PROBABILITY]))
+        # self.level_walls = self.create_level(2)
+        self.in_game = True
 
-    # def update_text(self):
-    #     """Обновление текста игровых очков"""
-    #
-    #     self.label.configure(text="Score: {0}\nHigh Score: {1}"
-    #                          .format(self.score, self.high_score),
-    #                          width=12, height=10)
+    def update_snake_state(self):
+        """Обновление состояния игрового поля"""
 
-    # def update_score(self, score):
-    #     """Обновление игровых очков"""
-    #
-    #     self.score = self.score + score
-    #     if self.score > self.high_score:
-    #         self.high_score = self.high_score + score
-    #     self.update_text()
+        for y in range(len(self.map)):
+            for x in range(len(self.map[y])):
+                for block in self.snake.blocks:
+                    if (x, y) == block.map_coords:
+                        self.map[y][x] = 1
+
+    def update_score(self, score):
+        """Обновление игровых очков"""
+
+        self.score = self.score + score
+        if self.score > self.high_score:
+            self.high_score = self.high_score + score

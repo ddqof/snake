@@ -25,19 +25,54 @@ class Canvas(tk.Canvas):
         self.bind("<KeyPress>", self.key_handle)
         self.last_handled_vector = snake_components.Vector(1, 0)
 
-    def drawing(self):
+    def update_canvas(self):
         self.delete('all')
-        for block in self.driver.snake.blocks:
-            self.create_rectangle(block.canvas_coords[0], block.canvas_coords[1], block.canvas_coords[2], block.canvas_coords[3], fill='white')
-        food_coords = self.driver.food.canvas_coords
-        self.create_oval(food_coords[0], food_coords[1], food_coords[2], food_coords[3], fill=self.driver.food.type)
+        for y in range(len(self.driver.map)):
+            for x in range(len(self.driver.map[y])):
+                if self.driver.map[y][x] == 1:
+                    self.create_rectangle(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
+                                          (y + 1) * BLOCK_SIZE, fill='white')
+                if self.driver.map[y][x] == 5:
+                    self.create_oval(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
+                                          (y + 1) * BLOCK_SIZE, fill=self.driver.food_types[5])
+                if self.driver.map[y][x] == 6:
+                    self.create_oval(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
+                                     (y + 1) * BLOCK_SIZE, fill=self.driver.food_types[6])
+                if self.driver.map[y][x] == 7:
+                    self.create_oval(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
+                                     (y + 1) * BLOCK_SIZE, fill=self.driver.food_types[7])
+                if self.driver.map[y][x] == 8:
+                    self.create_oval(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
+                                     (y + 1) * BLOCK_SIZE, fill=self.driver.food_types[8])
+
+        # food_coords = self.driver.food.map_coords
+
+        self.label.configure(text="Score: {0}\nHigh Score: {1}"
+                             .format(self.driver.score, self.driver.high_score),
+                             width=12, height=10)
+        if not self.driver.in_game:
+            self.create_text(
+                WIDTH / 2, HEIGHT / 2,
+                text="Game Over\nPress 'Enter' or 'Space' button to restart",
+                justify=tk.CENTER, font="Verdana {}".format(
+                    int(WIDTH / BLOCK_SIZE / 2)),
+                fill="cyan")
+        #
+        # for row in self.driver.map:
+        #     for x in row:
+        #         print("{:4d}".format(x), end="")
+        #     print()
+        #
+        # print('\n')
 
     def play(self):
         """Запуск игрового процесса"""
 
         self.driver.snake.move()
-        self.drawing()
-        self.root.after(int(self.driver.default_update_freq), self.play)
+        self.driver.snake.check_obstacles()
+        self.driver.check_boost_time()
+        self.update_canvas()
+        self.root.after(int(self.driver.current_update_freq), self.play)
 
     def key_handle(self, event):
         """Обработка нажатий на клавиши"""
@@ -59,8 +94,8 @@ class Canvas(tk.Canvas):
             if self.driver.snake.last_handled_vector.x == 0:
                 self.driver.snake.vector = snake_components.Vector(-1, 0)
 
-        # if (key == 'space' or key == 'Return') and not self.in_game:
-        #     self.restart_the_game()
+        if (key == 'space' or key == 'Return') and not self.driver.in_game:
+            self.driver.restart_the_game()
 
 
 def main():

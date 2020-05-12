@@ -22,17 +22,15 @@ class Block:
     """Компонент «блок змейки»"""
 
     def __init__(self, x, y):
-        self.canvas_coords = (x, y, x + BLOCK_SIZE, y + BLOCK_SIZE)
-        self.map_coords = (int(x / BLOCK_SIZE), int(y / BLOCK_SIZE))
+        self.map_coords = (x, y)
 
 
 class Food:
     """Компонент «еда змейки»"""
 
     def __init__(self):
-        self.type = None
-        self.canvas_coords = None
         self.map_coords = None
+        self.type = None
 
 
 class Snake:
@@ -46,90 +44,93 @@ class Snake:
 
     def move(self):
         """Движение змейки"""
-        self.last_handled_vector = self.vector
-        for index in reversed(range(1, len(self.blocks))):
-            x1, y1, x2, y2 = self.blocks[index - 1].canvas_coords
-            self.blocks[index].canvas_coords = (x1, y1, x2, y2)
+        if self.driver.in_game:
+            for y in range(len(self.driver.map)):
+                for x in range(len(self.driver.map[y])):
+                    for block in self.driver.snake.blocks:
+                        if (x, y) == block.map_coords:
+                            self.driver.map[y][x] = 0
 
-        x1, y1, x2, y2 = self.blocks[0].canvas_coords
-        self.blocks[0].canvas_coords = (x1 + self.vector.x * BLOCK_SIZE,
-                                        y1 + self.vector.y * BLOCK_SIZE,
-                                        x2 + self.vector.x * BLOCK_SIZE,
-                                        y2 + self.vector.y * BLOCK_SIZE)
+            self.last_handled_vector = self.vector
+            for index in reversed(range(1, len(self.blocks))):
+                x, y = self.blocks[index - 1].map_coords
+                self.blocks[index].map_coords = (x, y)
+
+            x, y = self.blocks[0].map_coords
+            self.blocks[0].map_coords = (x + self.vector.x,
+                                         y + self.vector.y)
+            self.driver.update_snake_state()
 
     def check_obstacles(self):
         """Проверка встречи всевозможных препятствий при движении"""
 
         self.check_self_eating()
         self.check_eat()
-        #self.check_walls()
+        self.check_walls()
 
     def check_self_eating(self):
         """Проверка столкновения змейки с самой собой"""
 
         for i in range(2, len(self.blocks)):
-            if self.blocks[0].canvas_coords == self.blocks[i].canvas_coords:
-                self.driver.finish_the_game()
+            if self.blocks[0].map_coords == self.blocks[i].map_coords:
+                self.driver.in_game = False
 
     def check_eat(self):
         """Обработка встречи еды"""
 
-        if (self.blocks[0].canvas_coords ==
-                self.driver.food.canvas_coords):
-            self.driver.map[self.driver.food.map_coords[1]][self.driver.food.map_coords[0]] = 1
-            if self.driver.food.type == 'red':
+        if (self.blocks[0].map_coords ==
+                self.driver.food.map_coords):
+            if self.driver.food.type == 5:
                 self.blocks.append(
-                    Block(self.blocks[-1].canvas_coords[0], self.blocks[-1].canvas_coords[1]))
+                    Block(self.blocks[-1].map_coords[0], self.blocks[-1].map_coords[1]))
                 self.driver.update_score(1)
-            if self.driver.food.type == 'green':
+            if self.driver.food.type == 6:
                 for i in range(len(self.blocks)):
                     self.blocks.append(
-                        Block(self.blocks[-1].canvas_coords[0], self.blocks[-1].canvas_coords[1]))
+                        Block(self.blocks[-1].map_coords[0], self.blocks[-1].map_coords[1]))
                 self.driver.update_score(self.driver.score)
-            if self.driver.food.type == 'cyan':
+            if self.driver.food.type == 7:
                 self.driver.update_score(2)
                 self.driver.current_update_freq /= BOOST_COEFFICIENT
-                self.driver.start_speed_up_time = time.perf_counter()
-            if self.driver.food.type == 'purple':
-                if (self.blocks[-1].canvas_coords[0] == self.blocks[-2].canvas_coords[0] and
-                        self.blocks[-2].canvas_coords[1] == self.blocks[-1].canvas_coords[1] - BLOCK_SIZE):
+                self.driver.boost_start_moment = time.perf_counter()
+            if self.driver.food.type == 8:
+                if (self.blocks[-1].map_coords[0] == self.blocks[-2].map_coords[0] and
+                        self.blocks[-2].map_coords[1] == self.blocks[-1].map_coords[1] - 1):
                     self.vector.y = 1
                     self.vector.x = 0
-                elif (self.blocks[-1].canvas_coords[0] == self.blocks[-2].canvas_coords[0] and
-                      self.blocks[-2].canvas_coords[1] == self.blocks[-1].canvas_coords[1] + BLOCK_SIZE):
+                elif (self.blocks[-1].map_coords[0] == self.blocks[-2].map_coords[0] and
+                      self.blocks[-2].map_coords[1] == self.blocks[-1].map_coords[1] + 1):
                     self.vector.y = -1
                     self.vector.x = 0
-                elif (self.blocks[-1].canvas_coords[1] == self.blocks[-2].canvas_coords[1] and
-                      self.blocks[-1].canvas_coords[0] == self.blocks[-2].canvas_coords[0] - BLOCK_SIZE):
+                elif (self.blocks[-1].map_coords[1] == self.blocks[-2].map_coords[1] and
+                      self.blocks[-1].map_coords[0] == self.blocks[-2].map_coords[0] - 1):
                     self.vector.y = 0
                     self.vector.x = -1
-                elif (self.blocks[-1].canvas_coords[1] == self.blocks[-2].canvas_coords[1] and
-                      self.blocks[-1].canvas_coords[0] == self.blocks[-2].canvas_coords[0] + BLOCK_SIZE):
+                elif (self.blocks[-1].map_coords[1] == self.blocks[-2].map_coords[1] and
+                      self.blocks[-1].map_coords[0] == self.blocks[-2].map_coords[0] + 1):
                     self.vector.y = 0
                     self.vector.x = 1
                 self.blocks.reverse()
                 self.driver.update_score(2)
             if self.driver.vanilla:
-                self.driver.create_food(['red'])
+                self.driver.get_food([5])
             else:
-                self.driver.create_food(random.choices(
-                    list(self.driver.food_types.values()),
+                self.driver.get_food(random.choices(
+                    list(self.driver.food_types.keys()),
                     weights=[DEFAULT_FOOD_PROBABILITY,
                              DOUBLE_LENGTH_PROBABILITY,
                              BOOST_PROBABILITY,
                              REVERSE_PROBABILITY]))
 
-    # TODO: check eat на drawing
-
-    # def check_walls(self):
-    #     """Проверка на столкновение змейки со стеной"""
-    #     # if self.driver.level == 0:
-    #     if (self.driver.coords(self.blocks[0].image)[2] > WIDTH or
-    #             self.driver.coords(self.blocks[0].image)[0] < 0 or
-    #             self.driver.coords(self.blocks[0].image)[3] > HEIGHT or
-    #             self.driver.coords(self.blocks[0].image)[1] < 0):
-    #         self.driver.finish_the_game()
-    #     else:
-    #         for obstacle in self.driver.level_walls:
-    #             if self.driver.coords(self.blocks[0].image) == self.driver.coords(obstacle):
-    #                 self.driver.finish_the_game()
+    def check_walls(self):
+        """Проверка на столкновение змейки со стеной"""
+        # if self.driver.level == 0:
+        if (self.blocks[0].map_coords[0] > 39 or
+                self.blocks[0].map_coords[0] < 0 or
+                self.blocks[0].map_coords[1] > 29 or
+                self.blocks[0].map_coords[1] < 0):
+            self.driver.in_game = False
+        # else:
+        #     for obstacle in self.driver.level_walls:
+        #         if self.driver.coords(self.blocks[0].image) == self.driver.coords(obstacle):
+        #             self.driver.in_game = False
