@@ -2,8 +2,7 @@
 
 import time
 import random
-from config import (WIDTH, HEIGHT, BLOCK_SIZE,
-                    DEFAULT_FOOD_PROBABILITY,
+from config import (DEFAULT_FOOD_PROBABILITY,
                     DOUBLE_LENGTH_PROBABILITY,
                     BOOST_PROBABILITY,
                     BOOST_COEFFICIENT,
@@ -124,13 +123,12 @@ class Snake:
 
     def check_walls(self):
         """Проверка на столкновение змейки со стеной"""
-        # if self.driver.level == 0:
         if (self.blocks[0].map_coords[0] > 39 or
                 self.blocks[0].map_coords[0] < 0 or
                 self.blocks[0].map_coords[1] > 29 or
                 self.blocks[0].map_coords[1] < 0):
             self.driver.in_game = False
-        # else:
-        #     for obstacle in self.driver.level_walls:
-        #         if self.driver.coords(self.blocks[0].image) == self.driver.coords(obstacle):
-        #             self.driver.in_game = False
+        if self.driver.level != 0:
+            for obstacle in self.driver.walls_coords:
+                if self.driver.snake.blocks[0].map_coords == obstacle:
+                    self.driver.in_game = False
