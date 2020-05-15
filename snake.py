@@ -43,6 +43,10 @@ class Canvas(tk.Canvas):
                 if self.driver.map[y][x] == 8:
                     self.create_oval(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
                                      (y + 1) * BLOCK_SIZE, fill=self.driver.food_types[8])
+        #
+        # for block in self.driver.snake.blocks:
+        #
+        #     self.create_rectangle()
 
         self.label.configure(text="Score: {0}\nHigh Score: {1}"
                              .format(self.driver.score, self.driver.high_score),
@@ -59,8 +63,8 @@ class Canvas(tk.Canvas):
         #     for x in row:
         #         print("{:4d}".format(x), end="")
         #     print()
-
-        print('\n')
+        #
+        # print('\n')
 
     def play(self):
         """Запуск игрового процесса"""
@@ -101,7 +105,7 @@ def main():
     args = parse_args()
     root = tk.Tk()
     root.title("Snake")
-    game_engine = snake_engine.Driver(3, args.v)
+    game_engine = snake_engine.Driver(1, args.v)
     game_gui = Canvas(game_engine, root, width=WIDTH, height=HEIGHT, bg="black")
     game_gui.pack()
     game_gui.focus_set()
