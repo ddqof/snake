@@ -57,13 +57,6 @@ class Canvas(tk.Canvas):
                     int(WIDTH / BLOCK_SIZE / 2)),
                 fill="cyan")
 
-        # for row in self.driver.map:
-        #     for x in row:
-        #         print("{:4d}".format(x), end="")
-        #     print()
-        #
-        # print('\n')
-
     def play(self):
         """Запуск игрового процесса"""
 
