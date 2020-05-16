@@ -3,7 +3,6 @@
 import time
 import snake_components
 import random
-from levels import FIRST_LEVEL
 from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
                     DEFAULT_FOOD_PROBABILITY,
                     DOUBLE_LENGTH_PROBABILITY,
@@ -11,18 +10,11 @@ from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
                     REVERSE_PROBABILITY)
 
 
-# TODO: добавить уровни
-
 class Driver:
     """Компонент «контроллер игры»"""
 
     def __init__(self, lvl, vanilla_flag):
         self.vanilla = vanilla_flag
-        self.snake = snake_components.Snake([
-            snake_components.Block(3, int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2)) / 2),
-            snake_components.Block(2, int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2)) / 2),
-            snake_components.Block(1, int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2)) / 2)], self)
-        print(int(BLOCK_SIZE * (WIDTH / BLOCK_SIZE ** 2)))
         self.map = []
         for y in range(int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2))):
             self.map.append([])
@@ -33,7 +25,10 @@ class Driver:
         self.vector = snake_components.Vector(1, 0)
         self.boost_start_moment = 0
         self.level = lvl
-        self.walls_coords = self.create_level()
+        self.in_game = None
+        self.objects_coords = self.create_level()
+        self.objects_coords['snake_blocks'].reverse()
+        self.snake = snake_components.Snake(self.objects_coords['snake_blocks'], self)
         self.food = snake_components.Food()
         self.food_types = {5: 'red', 6: 'green', 7: 'cyan', 8: 'purple'}
         if self.vanilla:
@@ -46,7 +41,6 @@ class Driver:
                                                   REVERSE_PROBABILITY]))
         self.score = 0
         self.high_score = 0
-        self.in_game = True
         self.last_handled_vector = snake_components.Vector(1, 0)
 
     def get_food(self, food_type):
@@ -60,7 +54,7 @@ class Driver:
         for block in self.snake.blocks:
             block_coords[index] = block.map_coords
             index += 1
-        for lvl_block in self.walls_coords:
+        for lvl_block in self.objects_coords['walls']:
             block_coords[index] = lvl_block
             index += 1
         if food_coords not in block_coords.values():
@@ -80,30 +74,28 @@ class Driver:
     def create_level(self):
         """Создание игрового уровня"""
 
-        walls = []
-        if self.level == 1:
-            self.map = FIRST_LEVEL
-            for y in range(len(self.map)):
-                for x in range(len(self.map[y])):
-                    if self.map[y][x] == 9:
-                        walls.append((x, y))
-            return walls
-        if self.level == 3:
-            walls_count = 0
-            while walls_count < 50:
-                block_coords = {}
-                wall_x = random.randint(0, BLOCK_SIZE * (WIDTH / BLOCK_SIZE ** 2) - 1)
-                wall_y = random.randint(0, BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2) - 1)
-                index = 0
-                for block in self.snake.blocks:
-                    block_coords[index] = block.map_coords
-                    index += 1
-                block_coords[index] = self.food.map_coords
-                if (wall_x, wall_y) not in block_coords.values():
-                    walls.append((wall_x, wall_y))
-                    self.map[wall_y][wall_x] = 9
-                    walls_count += 1
-        return walls
+        obstacles = {'walls': [], 'snake_blocks': []}
+        try:
+            with open(r'levels\{}.txt'.format(self.level), 'r') as f:
+                x = 0
+                y = 0
+                for line in f:
+                    for symbol in line:
+                        try:
+                            self.map[y][x] = int(symbol)
+                        except ValueError:
+                            continue
+                        if self.map[y][x] == 9:
+                            obstacles['walls'].append((x, y))
+                        if self.map[y][x] == 1:
+                            obstacles['snake_blocks'].append(snake_components.Block(x, y))
+                        x += 1
+                    y += 1
+                    x = 0
+            self.in_game = True
+        except FileNotFoundError or TypeError:
+            self.in_game = False
+        return obstacles
 
     def restart_the_game(self):
         """Перезаупуск игры"""
@@ -114,13 +106,11 @@ class Driver:
         self.boost_start_moment = 0
         self.current_update_freq = self.default_update_freq
         self.score = 0
-        self.snake = snake_components.Snake([
-            snake_components.Block(3, int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2)) / 2),
-            snake_components.Block(2, int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2)) / 2),
-            snake_components.Block(1, int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2)) / 2)], self)
-        self.snake = snake_components.Snake(self.snake.blocks, self)
+        self.objects_coords = self.create_level()
+        self.objects_coords['snake_blocks'].reverse()
+        self.snake = snake_components.Snake(self.objects_coords['snake_blocks'], self)
         self.update_snake_state()
-        for wall in self.walls_coords:
+        for wall in self.objects_coords['walls']:
             self.map[wall[1]][wall[0]] = 9
         if self.vanilla:
             self.get_food([5])
@@ -133,7 +123,7 @@ class Driver:
         self.in_game = True
 
     def update_snake_state(self):
-        """Обновление состояния игрового поля"""
+        """Обновление состояния змейки на игровом поле"""
 
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):

@@ -129,6 +129,6 @@ class Snake:
                 self.blocks[0].map_coords[1] < 0):
             self.driver.in_game = False
         if self.driver.level != 0:
-            for obstacle in self.driver.walls_coords:
+            for obstacle in self.driver.objects_coords['walls']:
                 if self.driver.snake.blocks[0].map_coords == obstacle:
                     self.driver.in_game = False

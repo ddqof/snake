@@ -22,6 +22,8 @@ class Canvas(tk.Canvas):
         self.last_handled_vector = snake_components.Vector(1, 0)
 
     def update_canvas(self):
+        """Обновление состояния игрового поля"""
+
         self.delete('all')
         for y in range(len(self.driver.map)):
             for x in range(len(self.driver.map[y])):
@@ -43,10 +45,6 @@ class Canvas(tk.Canvas):
                 if self.driver.map[y][x] == 8:
                     self.create_oval(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
                                      (y + 1) * BLOCK_SIZE, fill=self.driver.food_types[8])
-        #
-        # for block in self.driver.snake.blocks:
-        #
-        #     self.create_rectangle()
 
         self.label.configure(text="Score: {0}\nHigh Score: {1}"
                              .format(self.driver.score, self.driver.high_score),
@@ -105,7 +103,10 @@ def main():
     args = parse_args()
     root = tk.Tk()
     root.title("Snake")
-    game_engine = snake_engine.Driver(1, args.v)
+    game_engine = snake_engine.Driver(args.lvl, args.v)
+    if not game_engine.in_game:
+        print(r'This level does not exist. You can create it manually at folder \levels')
+        return
     game_gui = Canvas(game_engine, root, width=WIDTH, height=HEIGHT, bg="black")
     game_gui.pack()
     game_gui.focus_set()
@@ -127,7 +128,6 @@ def parse_args():
                         help='launch vanilla version of game',
                         action='store_true')
     parser.add_argument('-lvl',
-                        type=int,
                         help='select game level',
                         default=0)
     return parser.parse_args()
