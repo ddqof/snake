@@ -3,22 +3,62 @@
 import unittest
 import snake_engine
 import snake_components
-from config import WIDTH, HEIGHT, BLOCK_SIZE
 
 
 class TestMove(unittest.TestCase):
     def setUp(self) -> None:
-        self.engine = snake_engine.Driver('test_level', True)
+        self.engine = snake_engine.Driver(r'test_levels\move_only', True)
 
     def tearDown(self) -> None:
         pass
 
-    def test_move_right_for_one_block(self):
-        self.engine.snake.move()
-        snake_coords_after_move = []
+    def move_and_get_result(self, count):
+        for i in range(count):
+            self.engine.snake.move()
+        result = []
         for block in self.engine.snake.blocks:
-            snake_coords_after_move.append(block.map_coords)
-        self.assertEqual([(4, 1), (3, 1), (2, 1)], snake_coords_after_move)
+            result.append(block.map_coords)
+        return result
+
+    def test_move_right_for_one_block(self):
+        self.engine.snake.vector = snake_components.Vector(1, 0)
+        result = self.move_and_get_result(1)
+        expected = [(11, 13), (10, 13), (9, 13), (8, 13), (7, 13), (6, 13)]
+        self.assertEqual(expected, result)
+
+    def test_move_up_for_one_block(self):
+        self.engine.snake.vector = snake_components.Vector(0, -1)
+        result = self.move_and_get_result(1)
+        expected = [(10, 12), (10, 13), (9, 13), (8, 13), (7, 13), (6, 13)]
+        self.assertEqual(expected, result)
+
+    def test_move_down_for_one_block(self):
+        self.engine.snake.vector = snake_components.Vector(0, 1)
+        result = self.move_and_get_result(1)
+        expected = [(10, 14), (10, 13), (9, 13), (8, 13), (7, 13), (6, 13)]
+        self.assertEqual(expected, result)
+
+    def test_move_down_for_three_blocks(self):
+        self.engine.snake.vector = snake_components.Vector(0, 1)
+        result = self.move_and_get_result(3)
+        expected = [(10, 16), (10, 15), (10, 14), (10, 13), (9, 13), (8, 13)]
+        self.assertEqual(expected, result)
+
+    def test_difficult_path(self):
+        self.engine.snake.vector = snake_components.Vector(0, 1)
+        self.engine.snake.move()
+        self.engine.snake.vector = snake_components.Vector(1, 0)
+        self.engine.snake.move()
+        self.engine.snake.vector = snake_components.Vector(0, -1)
+        self.engine.snake.move()
+        self.engine.snake.vector = snake_components.Vector(1, 0)
+        self.engine.snake.move()
+        self.engine.snake.vector = snake_components.Vector(0, -1)
+        self.engine.snake.move()
+        self.engine.snake.vector = snake_components.Vector(-1, 0)
+        result = self.move_and_get_result(4)
+        expected = [(8, 12), (9, 12), (10, 12), (11, 12), (12, 12), (12, 13)]
+        self.assertEqual(expected, result)
 
 
 if __name__ == '__main__':
