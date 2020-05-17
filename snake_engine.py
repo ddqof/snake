@@ -80,9 +80,6 @@ class Driver:
                 y = 0
                 for line in f:
                     for symbol in line:
-                        if symbol == ' ':
-                            x += 1
-                            continue
                         if symbol == '9':
                             self.map[y][x] = 9
                             obstacles['walls'].append((x, y))
