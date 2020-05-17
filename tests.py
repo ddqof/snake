@@ -52,6 +52,9 @@ class TestMove(unittest.TestCase):
         self.engine.snake.move()
         self.engine.snake.vector = snake_components.Vector(0, -1)
         self.engine.snake.move()
+        result = self.move_and_get_result(0)
+        expected = [(12, 12), (12, 13), (11, 13), (11, 14), (10, 14), (10, 13)]
+        self.assertEqual(expected, result)
         self.engine.snake.vector = snake_components.Vector(-1, 0)
         result = self.move_and_get_result(4)
         expected = [(8, 12), (9, 12), (10, 12), (11, 12), (12, 12), (12, 13)]

@@ -80,13 +80,14 @@ class Driver:
                 y = 0
                 for line in f:
                     for symbol in line:
-                        try:
-                            self.map[y][x] = int(symbol)
-                        except ValueError:
+                        if symbol == ' ':
+                            x += 1
                             continue
-                        if self.map[y][x] == 9:
+                        if symbol == '9':
+                            self.map[y][x] = 9
                             obstacles['walls'].append((x, y))
-                        if self.map[y][x] == 1:
+                        if symbol == '1':
+                            self.map[y][x] = 1
                             obstacles['snake_blocks'].append(
                                 snake_components.Block(x, y))
                         x += 1
