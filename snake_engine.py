@@ -22,6 +22,7 @@ class Driver:
                 self.map[y].append(0)
         self.default_update_freq = int(1 / SNAKE_SPEED * 1000)
         self.current_update_freq = self.default_update_freq
+        self.vector = snake_components.Vector(1, 0)
         self.boost_start_moment = 0
         self.level = lvl
         self.in_game = None
@@ -40,6 +41,7 @@ class Driver:
                                                   REVERSE_PROBABILITY]))
         self.score = 0
         self.high_score = 0
+        self.last_handled_vector = snake_components.Vector(1, 0)
 
     def get_food(self, food_type):
         """Создание еды для змейки"""
