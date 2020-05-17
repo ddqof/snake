@@ -63,10 +63,17 @@ class Canvas(tk.Canvas):
                                      (y + 1) * BLOCK_SIZE,
                                      fill=self.driver.food_types[8])
 
-        self.label.configure(text="Score: {0}\nHigh Score: {1}"
-                             .format(self.driver.score,
-                                     self.driver.high_score),
-                             width=12, height=10)
+        if self.driver.level != 0:
+            self.label.configure(text="Score: {0}\nHigh Score: {1}\nHP: {2}"
+                                 .format(self.driver.score,
+                                         self.driver.high_score,
+                                         self.driver.snake.hp),
+                                 width=12, height=10)
+        else:
+            self.label.configure(text="Score: {0}\nHigh Score: {1}"
+                                 .format(self.driver.score,
+                                         self.driver.high_score),
+                                 width=12, height=10)
         if not self.driver.in_game:
             self.create_text(
                 WIDTH / 2, HEIGHT / 2,

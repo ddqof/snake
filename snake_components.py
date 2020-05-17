@@ -36,6 +36,7 @@ class Snake:
     """Компонент «змейка»"""
 
     def __init__(self, blocks, driver):
+        self.hp = 3
         self.driver = driver
         self.blocks = blocks
         self.vector = Vector(1, 0)
@@ -133,12 +134,17 @@ class Snake:
 
     def check_walls(self):
         """Проверка на столкновение змейки со стеной"""
-        if (self.blocks[0].map_coords[0] > 39 or
-                self.blocks[0].map_coords[0] < 0 or
-                self.blocks[0].map_coords[1] > 29 or
-                self.blocks[0].map_coords[1] < 0):
-            self.driver.in_game = False
-        if self.driver.level != 0:
-            for obstacle in self.driver.objects_coords['walls']:
-                if self.driver.snake.blocks[0].map_coords == obstacle:
-                    self.driver.in_game = False
+
+        if self.driver.in_game:
+            if (self.blocks[0].map_coords[0] > 39 or
+                    self.blocks[0].map_coords[0] < 0 or
+                    self.blocks[0].map_coords[1] > 29 or
+                    self.blocks[0].map_coords[1] < 0):
+                self.hp = 0
+                self.driver.in_game = False
+            if self.driver.level != 0:
+                for obstacle in self.driver.objects_coords['walls']:
+                    if self.driver.snake.blocks[0].map_coords == obstacle:
+                        self.hp -= 1
+                        if self.hp == 0:
+                            self.driver.in_game = False
