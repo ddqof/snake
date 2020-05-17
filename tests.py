@@ -6,19 +6,16 @@ import snake_components
 
 
 class TestMove(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.engine = snake_engine.Driver(r'test_levels\move_only', True)
-
-    def tearDown(self) -> None:
-        pass
 
     def move_and_get_result(self, count):
         for i in range(count):
             self.engine.snake.move()
-        result = []
+        coords = []
         for block in self.engine.snake.blocks:
-            result.append(block.map_coords)
-        return result
+            coords.append(block.map_coords)
+        return coords
 
     def test_move_right_for_one_block(self):
         self.engine.snake.vector = snake_components.Vector(1, 0)

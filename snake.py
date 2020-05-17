@@ -15,7 +15,8 @@ class Canvas(tk.Canvas):
         self.root = root
         self.driver = driver
         self.label = tk.Label(text="Score: {0}\nHigh Score: {1}"
-                              .format(self.driver.score, self.driver.high_score),
+                              .format(self.driver.score,
+                                      self.driver.high_score),
                               width=12, height=10)
         self.label.pack(side=tk.LEFT)
         self.bind("<KeyPress>", self.key_handle)
@@ -28,26 +29,43 @@ class Canvas(tk.Canvas):
         for y in range(len(self.driver.map)):
             for x in range(len(self.driver.map[y])):
                 if self.driver.map[y][x] == 9:
-                    self.create_rectangle(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
+                    self.create_rectangle(x * BLOCK_SIZE,
+                                          y * BLOCK_SIZE,
+                                          (x + 1) * BLOCK_SIZE,
                                           (y + 1) * BLOCK_SIZE, fill='gray')
                 if self.driver.map[y][x] == 1:
-                    self.create_rectangle(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
+                    self.create_rectangle(x * BLOCK_SIZE,
+                                          y * BLOCK_SIZE,
+                                          (x + 1) * BLOCK_SIZE,
                                           (y + 1) * BLOCK_SIZE, fill='white')
                 if self.driver.map[y][x] == 5:
-                    self.create_oval(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
-                                     (y + 1) * BLOCK_SIZE, fill=self.driver.food_types[5])
+                    self.create_oval(x * BLOCK_SIZE,
+                                     y * BLOCK_SIZE,
+                                     (x + 1) * BLOCK_SIZE,
+                                     (y + 1) * BLOCK_SIZE,
+                                     fill=self.driver.food_types[5])
                 if self.driver.map[y][x] == 6:
-                    self.create_oval(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
-                                     (y + 1) * BLOCK_SIZE, fill=self.driver.food_types[6])
+                    self.create_oval(x * BLOCK_SIZE,
+                                     y * BLOCK_SIZE,
+                                     (x + 1) * BLOCK_SIZE,
+                                     (y + 1) * BLOCK_SIZE,
+                                     fill=self.driver.food_types[6])
                 if self.driver.map[y][x] == 7:
-                    self.create_oval(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
-                                     (y + 1) * BLOCK_SIZE, fill=self.driver.food_types[7])
+                    self.create_oval(x * BLOCK_SIZE,
+                                     y * BLOCK_SIZE,
+                                     (x + 1) * BLOCK_SIZE,
+                                     (y + 1) * BLOCK_SIZE,
+                                     fill=self.driver.food_types[7])
                 if self.driver.map[y][x] == 8:
-                    self.create_oval(x * BLOCK_SIZE, y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE,
-                                     (y + 1) * BLOCK_SIZE, fill=self.driver.food_types[8])
+                    self.create_oval(x * BLOCK_SIZE,
+                                     y * BLOCK_SIZE,
+                                     (x + 1) * BLOCK_SIZE,
+                                     (y + 1) * BLOCK_SIZE,
+                                     fill=self.driver.food_types[8])
 
         self.label.configure(text="Score: {0}\nHigh Score: {1}"
-                             .format(self.driver.score, self.driver.high_score),
+                             .format(self.driver.score,
+                                     self.driver.high_score),
                              width=12, height=10)
         if not self.driver.in_game:
             self.create_text(
@@ -98,9 +116,11 @@ def main():
     root.title("Snake")
     game_engine = snake_engine.Driver(args.lvl, args.v)
     if not game_engine.in_game:
-        print(r'This level does not exist. You can create it manually at folder \levels')
+        print(r'This level does not exist.'
+              r' You can create it manually at folder \levels')
         return
-    game_gui = Canvas(game_engine, root, width=WIDTH, height=HEIGHT, bg="black")
+    game_gui = Canvas(game_engine, root, width=WIDTH,
+                      height=HEIGHT, bg="black")
     game_gui.pack()
     game_gui.focus_set()
     game_gui.play()

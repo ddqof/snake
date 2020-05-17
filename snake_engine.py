@@ -22,13 +22,13 @@ class Driver:
                 self.map[y].append(0)
         self.default_update_freq = int(1 / SNAKE_SPEED * 1000)
         self.current_update_freq = self.default_update_freq
-        self.vector = snake_components.Vector(1, 0)
         self.boost_start_moment = 0
         self.level = lvl
         self.in_game = None
         self.objects_coords = self.create_level()
         self.objects_coords['snake_blocks'].reverse()
-        self.snake = snake_components.Snake(self.objects_coords['snake_blocks'], self)
+        self.snake = snake_components.Snake(
+            self.objects_coords['snake_blocks'], self)
         self.food = snake_components.Food()
         self.food_types = {5: 'red', 6: 'green', 7: 'cyan', 8: 'purple'}
         if self.vanilla:
@@ -41,7 +41,6 @@ class Driver:
                                                   REVERSE_PROBABILITY]))
         self.score = 0
         self.high_score = 0
-        self.last_handled_vector = snake_components.Vector(1, 0)
 
     def get_food(self, food_type):
         """Создание еды для змейки"""
@@ -88,7 +87,8 @@ class Driver:
                         if self.map[y][x] == 9:
                             obstacles['walls'].append((x, y))
                         if self.map[y][x] == 1:
-                            obstacles['snake_blocks'].append(snake_components.Block(x, y))
+                            obstacles['snake_blocks'].append(
+                                snake_components.Block(x, y))
                         x += 1
                     y += 1
                     x = 0
@@ -108,7 +108,8 @@ class Driver:
         self.score = 0
         self.objects_coords = self.create_level()
         self.objects_coords['snake_blocks'].reverse()
-        self.snake = snake_components.Snake(self.objects_coords['snake_blocks'], self)
+        self.snake = snake_components.Snake(
+            self.objects_coords['snake_blocks'], self)
         self.update_snake_state()
         for wall in self.objects_coords['walls']:
             self.map[wall[1]][wall[0]] = 9
