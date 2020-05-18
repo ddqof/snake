@@ -16,6 +16,9 @@ class Vector:
         self.x = x
         self.y = y
 
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
 
 class Block:
     """Компонент «блок змейки»"""
@@ -28,7 +31,7 @@ class Food:
     """Компонент «еда змейки»"""
 
     def __init__(self):
-        self.map_coords = []
+        self.map_coords = None
         self.type = None
 
 
