@@ -13,8 +13,8 @@ from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
 class Driver:
     """Компонент «контроллер игры»"""
 
-    def __init__(self, lvl, vanilla_flag):
-        self.vanilla = vanilla_flag
+    def __init__(self, lvl, food_flag):
+        self.vanilla = food_flag
         self.map = []
         for y in range(int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2))):
             self.map.append([])
@@ -25,15 +25,15 @@ class Driver:
         self.boost_start_moment = 0
         self.level = lvl
         self.in_game = None
+        self.food = snake_components.Food()
         self.objects_coords = self.create_level()
         self.objects_coords['snake_blocks'].reverse()
         self.snake = snake_components.Snake(
             self.objects_coords['snake_blocks'], self)
-        self.food = snake_components.Food()
         self.food_types = {5: 'red', 6: 'green', 7: 'cyan', 8: 'purple'}
         if self.vanilla:
             self.get_food([5])
-        else:
+        if self.vanilla is False:
             self.get_food(random.choices((list(self.food_types.keys())),
                                          weights=[DEFAULT_FOOD_PROBABILITY,
                                                   DOUBLE_LENGTH_PROBABILITY,
@@ -80,10 +80,14 @@ class Driver:
                 y = 0
                 for line in f:
                     for symbol in line:
-                        if symbol == '9':
+                        if symbol == '5' or symbol == '6' or symbol == '7' or symbol == '8':
+                            self.map[y][x] = int(symbol)
+                            self.food.map_coords = (x, y)
+                            self.food.type = int(symbol)
+                        elif symbol == '9':
                             self.map[y][x] = 9
                             obstacles['walls'].append((x, y))
-                        if symbol == '1':
+                        elif symbol == '1':
                             self.map[y][x] = 1
                             obstacles['snake_blocks'].append(
                                 snake_components.Block(x, y))

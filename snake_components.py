@@ -28,7 +28,7 @@ class Food:
     """Компонент «еда змейки»"""
 
     def __init__(self):
-        self.map_coords = None
+        self.map_coords = []
         self.type = None
 
 
@@ -85,17 +85,17 @@ class Snake:
                     Block(self.blocks[-1].map_coords[0],
                           self.blocks[-1].map_coords[1]))
                 self.driver.update_score(1)
-            if self.driver.food.type == 6:
+            elif self.driver.food.type == 6:
                 for i in range(len(self.blocks)):
                     self.blocks.append(
                         Block(self.blocks[-1].map_coords[0],
                               self.blocks[-1].map_coords[1]))
                 self.driver.update_score(self.driver.score)
-            if self.driver.food.type == 7:
+            elif self.driver.food.type == 7:
                 self.driver.update_score(2)
                 self.driver.current_update_freq /= BOOST_COEFFICIENT
                 self.driver.boost_start_moment = time.perf_counter()
-            if self.driver.food.type == 8:
+            elif self.driver.food.type == 8:
                 if (self.blocks[-1].map_coords[0] ==
                         self.blocks[-2].map_coords[0] and
                         self.blocks[-2].map_coords[1] ==
