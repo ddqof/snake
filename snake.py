@@ -4,6 +4,7 @@ import argparse
 import snake_engine
 import tkinter as tk
 import snake_components
+import os
 from config import BLOCK_SIZE, WIDTH, HEIGHT
 
 
@@ -124,8 +125,8 @@ def main():
     root.title("Snake")
     game_engine = snake_engine.Driver(args.lvl, args.v)
     if not game_engine.in_game:
-        print(r'This level does not exist.'
-              r' You can create it manually at folder \'levels\'')
+        print(os.path.join('This level does not exist. You can create it manually at ',
+                           'levels folder'))
         return
     game_gui = Canvas(game_engine, root, width=WIDTH,
                       height=HEIGHT, bg="black")
