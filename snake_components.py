@@ -62,7 +62,6 @@ class Snake:
             x, y = self.blocks[0].map_coords
             self.blocks[0].map_coords = (x + self.vector.x,
                                          y + self.vector.y)
-            self.driver.update_snake_state()
 
     def check_obstacles(self):
         """Проверка встречи всевозможных препятствий при движении"""

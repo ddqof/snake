@@ -86,6 +86,7 @@ class Canvas(tk.Canvas):
         """Запуск игрового процесса"""
 
         self.driver.snake.move()
+        self.driver.update_snake_state()
         self.driver.snake.check_obstacles()
         self.driver.check_boost_time()
         self.update_canvas()

@@ -69,7 +69,7 @@ class SnakeMove(unittest.TestCase):
         result = self.move_and_get_snake_coords(11)
         expected = [(-1, 12), (0, 12), (1, 12), (2, 12), (3, 12), (4, 12)]
         self.engine.snake.check_walls()
-        self.assertEqual(self.engine.in_game, False)
+        self.assertFalse(self.engine.in_game)
         self.assertListEqual(expected, result)
         self.engine.snake.check_walls()
         self.engine.snake.move()
@@ -84,7 +84,7 @@ class SnakeMove(unittest.TestCase):
         result = self.move_and_get_snake_coords(1)
         expected = [(9, 13), (9, 14), (10, 14), (10, 13), (9, 13), (8, 13)]
         self.engine.snake.check_self_eating()
-        self.assertEqual(self.engine.in_game, False)
+        self.assertFalse(self.engine.in_game)
         self.assertListEqual(expected, result)
         self.engine.snake.move()
         self.assertListEqual(expected, result)
@@ -109,6 +109,7 @@ class SnakeInteractionsWithMap(unittest.TestCase):
         result = self.move_and_get_snake_coords(1)
         expected = [(12, 13), (11, 13), (10, 13), (9, 13),
                     (8, 13), (7, 13), (6, 13)]
+        self.assertEqual(self.engine.score, 1)
         self.assertEqual(len(expected), len(result))
         self.assertListEqual(expected, result)
 
@@ -177,6 +178,55 @@ class SnakeInteractionsWithMap(unittest.TestCase):
         self.assertEqual(snake_components.Vector(0, 1),
                          self.engine.snake.vector)
         self.assertListEqual(expected, result)
+
+
+class DriverActions(unittest.TestCase):
+
+    def test_restart_game(self):
+        level = os.path.join('test_levels', 'restart')
+        self.engine = snake_engine.Driver(level, None)
+        self.engine.snake.vector = snake_components.Vector(0, 1)
+        for i in range(4):
+            self.engine.snake.move()
+        self.engine.snake.check_walls()
+        self.assertFalse(self.engine.in_game)
+        self.engine.restart_the_game()
+        snake_coords = []
+        for block in self.engine.snake.blocks:
+            snake_coords.append(block.map_coords)
+        self.assertTrue(self.engine.in_game)
+        self.assertIsNotNone(self.engine.food.type)
+        self.assertIsNotNone(self.engine.food.map_coords)
+        self.assertListEqual([(13, 26), (13, 25), (13, 24)], snake_coords)
+
+    def test_create_level(self):
+        self.engine = snake_engine.Driver(0, None)
+        level_map = []
+        for y in range(30):
+            level_map.append([])
+            for x in range(40):
+                level_map[y].append(0)
+        for y in range(30):
+            for x in range(40):
+                if y == 2 and (x == 1 or x == 2 or x == 3):
+                    level_map[y][x] = 1
+        self.assertListEqual(level_map, self.engine.map)
+
+    def test_update_snake_state(self):
+        self.engine = snake_engine.Driver(0, None)
+        self.engine.snake.vector = snake_components.Vector(1, 0)
+        self.engine.snake.move()
+        self.engine.update_snake_state()
+        level_map = []
+        for y in range(30):
+            level_map.append([])
+            for x in range(40):
+                level_map[y].append(0)
+        for y in range(30):
+            for x in range(40):
+                if y == 2 and (x == 2 or x == 3 or x == 4):
+                    level_map[y][x] = 1
+        self.assertListEqual(level_map, self.engine.map)
 
 
 if __name__ == '__main__':

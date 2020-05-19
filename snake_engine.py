@@ -76,7 +76,7 @@ class Driver:
 
         obstacles = {'walls': [], 'snake_blocks': []}
         try:
-            level = os.path.join('levels', self.level + '.txt')
+            level = os.path.join('levels', str(self.level) + '.txt')
             with open(level, 'r') as f:
                 x = 0
                 y = 0
