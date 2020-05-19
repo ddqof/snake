@@ -105,22 +105,22 @@ class Snake:
                         self.blocks[-1].map_coords[1] - 1):
                     self.vector.y = 1
                     self.vector.x = 0
-                elif (self.blocks[-1].map_coords[0] ==
-                      self.blocks[-2].map_coords[0] and
-                      self.blocks[-2].map_coords[1] ==
-                      self.blocks[-1].map_coords[1] + 1):
+                if (self.blocks[-1].map_coords[0] ==
+                        self.blocks[-2].map_coords[0] and
+                        self.blocks[-2].map_coords[1] ==
+                        self.blocks[-1].map_coords[1] + 1):
                     self.vector.y = -1
                     self.vector.x = 0
-                elif (self.blocks[-1].map_coords[1] ==
-                      self.blocks[-2].map_coords[1] and
-                      self.blocks[-1].map_coords[0] ==
-                      self.blocks[-2].map_coords[0] - 1):
+                if (self.blocks[-1].map_coords[1] ==
+                        self.blocks[-2].map_coords[1] and
+                        self.blocks[-1].map_coords[0] ==
+                        self.blocks[-2].map_coords[0] - 1):
                     self.vector.y = 0
                     self.vector.x = -1
-                elif (self.blocks[-1].map_coords[1] ==
-                      self.blocks[-2].map_coords[1] and
-                      self.blocks[-1].map_coords[0] ==
-                      self.blocks[-2].map_coords[0] + 1):
+                if (self.blocks[-1].map_coords[1] ==
+                        self.blocks[-2].map_coords[1] and
+                        self.blocks[-1].map_coords[0] ==
+                        self.blocks[-2].map_coords[0] + 1):
                     self.vector.y = 0
                     self.vector.x = 1
                 self.blocks.reverse()

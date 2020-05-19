@@ -80,7 +80,8 @@ class Driver:
                 y = 0
                 for line in f:
                     for symbol in line:
-                        if symbol == '5' or symbol == '6' or symbol == '7' or symbol == '8':
+                        if (symbol == '5' or symbol == '6' or
+                                symbol == '7' or symbol == '8'):
                             self.map[y][x] = int(symbol)
                             self.food.map_coords = (x, y)
                             self.food.type = int(symbol)
