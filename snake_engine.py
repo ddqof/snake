@@ -3,6 +3,7 @@
 import time
 import snake_components
 import random
+import os
 from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
                     DEFAULT_FOOD_PROBABILITY,
                     DOUBLE_LENGTH_PROBABILITY,
@@ -75,7 +76,8 @@ class Driver:
 
         obstacles = {'walls': [], 'snake_blocks': []}
         try:
-            with open(r'levels\{}.txt'.format(self.level), 'r') as f:
+            level = os.path.join('levels', self.level + '.txt')
+            with open(level, 'r') as f:
                 x = 0
                 y = 0
                 for line in f:

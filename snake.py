@@ -124,7 +124,7 @@ def main():
     game_engine = snake_engine.Driver(args.lvl, args.v)
     if not game_engine.in_game:
         print(r'This level does not exist.'
-              r' You can create it manually at folder \levels')
+              r' You can create it manually at folder \'levels\'')
         return
     game_gui = Canvas(game_engine, root, width=WIDTH,
                       height=HEIGHT, bg="black")
