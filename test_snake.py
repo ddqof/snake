@@ -62,17 +62,19 @@ class SnakeMove(unittest.TestCase):
         expected = [(8, 12), (9, 12), (10, 12), (11, 12), (12, 12), (12, 13)]
         self.assertListEqual(expected, result)
 
-    def test_stop_when_crashing(self):
+    def test_bounds(self):
         self.engine.snake.vector = snake_components.Vector(0, -1)
         self.engine.snake.move()
         self.engine.snake.vector = snake_components.Vector(-1, 0)
-        result = self.move_and_get_snake_coords(11)
-        expected = [(-1, 12), (0, 12), (1, 12), (2, 12), (3, 12), (4, 12)]
+        for i in range(11):
+            self.engine.snake.move()
         self.engine.snake.check_walls()
-        self.assertFalse(self.engine.in_game)
+        result = self.move_and_get_snake_coords(0)
+        expected = [(39, 12), (0, 12), (1, 12), (2, 12), (3, 12), (4, 12)]
+        self.assertTrue(self.engine.in_game)
         self.assertListEqual(expected, result)
-        self.engine.snake.check_walls()
-        self.engine.snake.move()
+        result = self.move_and_get_snake_coords(1)
+        expected = [(38, 12), (39, 12), (0, 12), (1, 12), (2, 12), (3, 12)]
         self.assertListEqual(expected, result)
 
     def test_self_eating(self):
@@ -183,12 +185,11 @@ class SnakeInteractionsWithMap(unittest.TestCase):
 class DriverActions(unittest.TestCase):
 
     def test_restart_game(self):
-        level = os.path.join('test_levels', 'restart')
-        self.engine = snake_engine.Driver(level, None)
-        self.engine.snake.vector = snake_components.Vector(0, 1)
-        for i in range(4):
+        self.engine = snake_engine.Driver(1, None)
+        self.engine.snake.vector = snake_components.Vector(0, -1)
+        for i in range(9):
             self.engine.snake.move()
-        self.engine.snake.check_walls()
+            self.engine.snake.check_walls()
         self.assertFalse(self.engine.in_game)
         self.engine.restart_the_game()
         snake_coords = []
@@ -197,7 +198,7 @@ class DriverActions(unittest.TestCase):
         self.assertTrue(self.engine.in_game)
         self.assertIsNotNone(self.engine.food.type)
         self.assertIsNotNone(self.engine.food.map_coords)
-        self.assertListEqual([(13, 26), (13, 25), (13, 24)], snake_coords)
+        self.assertListEqual([(2, 14), (1, 14), (0, 14)], snake_coords)
 
     def test_create_level(self):
         self.engine = snake_engine.Driver(0, None)
