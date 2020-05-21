@@ -125,7 +125,8 @@ def main():
     root.title("Snake")
     game_engine = snake_engine.Driver(args.lvl, args.v)
     if not game_engine.in_game:
-        print(os.path.join('This level does not exist. You can create it manually at ',
+        print(os.path.join('This level does not exist.'
+                           ' You can create it manually at ',
                            'levels folder'))
         return
     game_gui = Canvas(game_engine, root, width=WIDTH,
