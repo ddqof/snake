@@ -9,7 +9,7 @@ from config import BLOCK_SIZE, WIDTH, HEIGHT
 
 
 class Canvas(tk.Canvas):
-    """Компонент «игрвоое поле»"""
+    """Компонент «игровое поле»"""
 
     def __init__(self, driver, root, **kwargs):
         super(Canvas, self).__init__(root, kwargs)
