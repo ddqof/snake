@@ -29,6 +29,11 @@ class Canvas(tk.Canvas):
         self.delete('all')
         for y in range(len(self.driver.map)):
             for x in range(len(self.driver.map[y])):
+                if self.driver.map[y][x] == 2:
+                    self.create_rectangle(x * BLOCK_SIZE,
+                                          y * BLOCK_SIZE,
+                                          (x + 1) * BLOCK_SIZE,
+                                          (y + 1) * BLOCK_SIZE, fill='cyan')
                 if self.driver.map[y][x] == 9:
                     self.create_rectangle(x * BLOCK_SIZE,
                                           y * BLOCK_SIZE,

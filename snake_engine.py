@@ -24,7 +24,7 @@ class Driver:
         self.default_update_freq = int(1 / SNAKE_SPEED * 1000)
         self.current_update_freq = self.default_update_freq
         self.boost_start_moment = 0
-        self.level = lvl
+        self.level = lvl 
         self.in_game = None
         self.food = snake_components.Food()
         self.objects_coords = self.create_level()
@@ -74,7 +74,7 @@ class Driver:
     def create_level(self):
         """Создание игрового уровня"""
 
-        obstacles = {'walls': [], 'snake_blocks': []}
+        obstacles = {'walls': [], 'edges' : [], 'snake_blocks': []}
         try:
             level = os.path.join('levels', str(self.level) + '.txt')
             with open(level, 'r') as f:
@@ -88,8 +88,22 @@ class Driver:
                             self.food.map_coords = (x, y)
                             self.food.type = int(symbol)
                         elif symbol == '9':
-                            self.map[y][x] = 9
+                            if x != 0 and self.map[y][x - 1] == 0:
+                                obstacles['edges'].append((x, y))
+                                self.map[y][x] = 2
+                            elif y != 0 and self.map[y - 1][x] == 0:
+                                obstacles['edges'].append((x, y))
+                                self.map[y][x] = 2
+                            else:
+                                self.map[y][x] = 9
                             obstacles['walls'].append((x, y))
+                        elif symbol == '0':
+                            if y != 0 and self.map[y - 1][x] == 9:
+                                obstacles['edges'].append((x, y - 1))
+                                self.map[y - 1][x] = 2
+                            if x != 0 and self.map[y][x - 1] == 9:
+                                obstacles['edges'].append((x - 1, y))
+                                self.map[y][x - 1] = 2
                         elif symbol == '1':
                             self.map[y][x] = 1
                             obstacles['snake_blocks'].append(
@@ -103,7 +117,7 @@ class Driver:
         return obstacles
 
     def restart_the_game(self):
-        """Перезаупуск игры"""
+        """Перезапуск игры"""
 
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
@@ -136,6 +150,11 @@ class Driver:
                 for block in self.snake.blocks:
                     if (x, y) == block.map_coords:
                         self.map[y][x] = 1
+        # for row in self.map:
+        #     for elem in row:
+        #         print(elem, end=' ')
+        #     print()
+        # print()
 
     def update_score(self, score):
         """Обновление игровых очков"""
