@@ -138,7 +138,7 @@ class Snake:
         """Проверка на столкновение змейки со стеной"""
 
         if self.driver.in_game:
-            if not self.driver.vanilla:
+            if int(self.driver.level) == 0:
                 if self.blocks[0].map_coords[0] > 39:
                     self.blocks[0].map_coords = (0, self.blocks[0].map_coords[1])
                 if self.blocks[0].map_coords[0] < 0:
@@ -153,8 +153,8 @@ class Snake:
                         self.blocks[0].map_coords[1] > 29 or
                         self.blocks[0].map_coords[1] < 0):
                     self.driver.in_game = False
-        if self.driver.level != 0:
-            for obstacle in self.driver.objects_coords['walls']:
+        if self.driver.level != 0 and self.hp > 0:
+            for obstacle in self.driver.obstacles['walls']:
                 if self.driver.snake.blocks[0].map_coords == obstacle:
                     self.hp -= 1
                     if self.hp == 0:

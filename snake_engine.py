@@ -24,13 +24,15 @@ class Driver:
         self.default_update_freq = int(1 / SNAKE_SPEED * 1000)
         self.current_update_freq = self.default_update_freq
         self.boost_start_moment = 0
-        self.level = lvl 
+        self.level = int(lvl)
         self.in_game = None
         self.food = snake_components.Food()
-        self.objects_coords = self.create_level()
-        self.objects_coords['snake_blocks'].reverse()
+        self.obstacles = self.create_level()
+        if self.level != 0:
+            self.create_teleport()
+        self.obstacles['snake_blocks'].reverse()
         self.snake = snake_components.Snake(
-            self.objects_coords['snake_blocks'], self)
+            self.obstacles['snake_blocks'], self)
         self.food_types = {5: 'red', 6: 'green', 7: 'cyan', 8: 'purple'}
         if self.vanilla:
             self.get_food([5])
@@ -54,7 +56,7 @@ class Driver:
         for block in self.snake.blocks:
             block_coords[index] = block.map_coords
             index += 1
-        for lvl_block in self.objects_coords['walls']:
+        for lvl_block in self.obstacles['walls']:
             block_coords[index] = lvl_block
             index += 1
         if food_coords not in block_coords.values():
@@ -74,7 +76,7 @@ class Driver:
     def create_level(self):
         """Создание игрового уровня"""
 
-        obstacles = {'walls': [], 'edges' : [], 'snake_blocks': []}
+        obstacles = {'walls': [], 'edges': [], 'snake_blocks': []}
         try:
             level = os.path.join('levels', str(self.level) + '.txt')
             with open(level, 'r') as f:
@@ -88,22 +90,15 @@ class Driver:
                             self.food.map_coords = (x, y)
                             self.food.type = int(symbol)
                         elif symbol == '9':
-                            if x != 0 and self.map[y][x - 1] == 0:
+                            if (x != 0 and self.map[y][x - 1] == 0) or (y != 0 and self.map[y - 1][x] == 0):
                                 obstacles['edges'].append((x, y))
-                                self.map[y][x] = 2
-                            elif y != 0 and self.map[y - 1][x] == 0:
-                                obstacles['edges'].append((x, y))
-                                self.map[y][x] = 2
-                            else:
-                                self.map[y][x] = 9
+                            self.map[y][x] = 9
                             obstacles['walls'].append((x, y))
                         elif symbol == '0':
-                            if y != 0 and self.map[y - 1][x] == 9:
+                            if y != 0 and self.map[y - 1][x] == 9 and (x, y - 1) not in obstacles['edges']:
                                 obstacles['edges'].append((x, y - 1))
-                                self.map[y - 1][x] = 2
-                            if x != 0 and self.map[y][x - 1] == 9:
+                            if x != 0 and self.map[y][x - 1] == 9 and (x - 1, y) not in obstacles['edges']:
                                 obstacles['edges'].append((x - 1, y))
-                                self.map[y][x - 1] = 2
                         elif symbol == '1':
                             self.map[y][x] = 1
                             obstacles['snake_blocks'].append(
@@ -116,6 +111,12 @@ class Driver:
             self.in_game = False
         return obstacles
 
+    def create_teleport(self):
+        edge_number = random.randint(0, len(self.obstacles['edges']))
+        x = self.obstacles['edges'][edge_number][0]
+        y = self.obstacles['edges'][edge_number][1]
+        self.map[y][x] = 2
+
     def restart_the_game(self):
         """Перезапуск игры"""
 
@@ -125,12 +126,12 @@ class Driver:
         self.boost_start_moment = 0
         self.current_update_freq = self.default_update_freq
         self.score = 0
-        self.objects_coords = self.create_level()
-        self.objects_coords['snake_blocks'].reverse()
+        self.obstacles = self.create_level()
+        self.obstacles['snake_blocks'].reverse()
         self.snake = snake_components.Snake(
-            self.objects_coords['snake_blocks'], self)
+            self.obstacles['snake_blocks'], self)
         self.update_snake_state()
-        for wall in self.objects_coords['walls']:
+        for wall in self.obstacles['walls']:
             self.map[wall[1]][wall[0]] = 9
         if self.vanilla:
             self.get_food([5])
@@ -140,6 +141,9 @@ class Driver:
                                                   DOUBLE_LENGTH_PROBABILITY,
                                                   BOOST_PROBABILITY,
                                                   REVERSE_PROBABILITY]))
+
+        if self.level != 0:
+            self.create_teleport()
         self.in_game = True
 
     def update_snake_state(self):

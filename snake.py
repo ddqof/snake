@@ -33,7 +33,7 @@ class Canvas(tk.Canvas):
                     self.create_rectangle(x * BLOCK_SIZE,
                                           y * BLOCK_SIZE,
                                           (x + 1) * BLOCK_SIZE,
-                                          (y + 1) * BLOCK_SIZE, fill='cyan')
+                                          (y + 1) * BLOCK_SIZE, fill='SlateBlue1')
                 if self.driver.map[y][x] == 9:
                     self.create_rectangle(x * BLOCK_SIZE,
                                           y * BLOCK_SIZE,
