@@ -9,17 +9,16 @@ from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
                     DOUBLE_LENGTH_PROBABILITY,
                     BOOST_PROBABILITY,
                     REVERSE_PROBABILITY)
-from collections import namedtuple
-
-
 
 
 class Teleport:
     def __init__(self, driver):
         edges = driver.obstacles['edges']
         start_end_indexes = random.sample(range(0, len(edges) - 1), 2)
-        self.start = Point(edges[start_end_indexes[0]].x, edges[start_end_indexes[0]].y)
-        self.end = Point(edges[start_end_indexes[1]].x, edges[start_end_indexes[1]].y)
+        self.start = Point(edges[start_end_indexes[0]].x,
+                           edges[start_end_indexes[0]].y)
+        self.end = Point(edges[start_end_indexes[1]].x,
+                         edges[start_end_indexes[1]].y)
         driver.map[self.start.y][self.start.x] = 2
 
 
@@ -102,14 +101,17 @@ class Driver:
                             self.food.map_coords = Point(x, y)
                             self.food.type = int(symbol)
                         elif symbol == '9':
-                            if (x != 0 and self.map[y][x - 1] == 0) or (y != 0 and self.map[y - 1][x] == 0):
+                            if (x != 0 and self.map[y][x - 1] == 0) or\
+                                    (y != 0 and self.map[y - 1][x] == 0):
                                 obstacles['edges'].append(Point(x, y))
                             self.map[y][x] = 9
                             obstacles['walls'].append(Point(x, y))
                         elif symbol == '0':
-                            if y != 0 and self.map[y - 1][x] == 9 and Point(x, y - 1) not in obstacles['edges']:
+                            if y != 0 and self.map[y - 1][x] == 9 and\
+                                    Point(x, y - 1) not in obstacles['edges']:
                                 obstacles['edges'].append(Point(x, y - 1))
-                            if x != 0 and self.map[y][x - 1] == 9 and Point(x - 1, y) not in obstacles['edges']:
+                            if x != 0 and self.map[y][x - 1] == 9 and\
+                                    Point(x - 1, y) not in obstacles['edges']:
                                 obstacles['edges'].append(Point(x - 1, y))
                         elif symbol == '1':
                             self.map[y][x] = 1

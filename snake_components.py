@@ -65,14 +65,11 @@ class Snake:
 
             self.last_handled_vector = self.vector
             for index in reversed(range(1, len(self.blocks))):
-                # x, y = self.blocks[index - 1].map_coords
-                # self.blocks[index].map_coords = (x, y)
-                self.blocks[index].map_coords = Point(self.blocks[index - 1].map_coords.x,
-                                                      self.blocks[index - 1].map_coords.y)
-
+                self.blocks[index].map_coords = Point(
+                    self.blocks[index - 1].map_coords.x,
+                    self.blocks[index - 1].map_coords.y)
             x = self.blocks[0].map_coords.x
             y = self.blocks[0].map_coords.y
-            # x, y = self.blocks[0].map_coords
             self.blocks[0].map_coords = Point(x + self.vector.x,
                                               y + self.vector.y)
 
@@ -153,17 +150,24 @@ class Snake:
         if self.driver.in_game:
             if int(self.driver.level) == 0:
                 if self.blocks[0].map_coords.x > 39:
-                    self.blocks[0].map_coords = Point(0, self.blocks[0].map_coords.y)
+                    self.blocks[0].map_coords =\
+                        Point(0, self.blocks[0].map_coords.y)
                 if self.blocks[0].map_coords.x < 0:
-                    self.blocks[0].map_coords = Point(39, self.blocks[0].map_coords.y)
+                    self.blocks[0].map_coords =\
+                        Point(39, self.blocks[0].map_coords.y)
                 if self.blocks[0].map_coords.y > 29:
-                    self.blocks[0].map_coords = Point(self.blocks[0].map_coords.x, 0)
+                    self.blocks[0].map_coords =\
+                        Point(self.blocks[0].map_coords.x, 0)
                 if self.blocks[0].map_coords.y < 0:
-                    self.blocks[0].map_coords = Point(self.blocks[0].map_coords.x, 29)
+                    self.blocks[0].map_coords =\
+                        Point(self.blocks[0].map_coords.x, 29)
             else:
-                if self.blocks[0].map_coords == Point(self.driver.teleport.start.x, self.driver.teleport.start.y):
-                    if self.driver.map[self.driver.teleport.end.y][self.driver.teleport.end.x + 1] == 0:
-                        self.blocks[0].map_coords = Point(self.driver.teleport.end.x + 1, self.driver.teleport.end.y)
+                teleport = self.driver.teleport
+                if self.blocks[0].map_coords == Point(
+                        teleport.start.x, teleport.start.y):
+                    if self.driver.map[teleport.end.y][teleport.end.x + 1] == 0:
+                        self.blocks[0].map_coords =\
+                            Point(teleport.end.x + 1, teleport.end.y)
                 if (self.blocks[0].map_coords.x > 39 or
                         self.blocks[0].map_coords.x < 0 or
                         self.blocks[0].map_coords.y > 29 or
