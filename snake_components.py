@@ -9,6 +9,15 @@ from config import (DEFAULT_FOOD_PROBABILITY,
                     REVERSE_PROBABILITY)
 
 
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+
 class Vector:
     """Компонент «вектор змейки»"""
 
@@ -24,7 +33,7 @@ class Block:
     """Компонент «блок змейки»"""
 
     def __init__(self, x, y):
-        self.map_coords = (x, y)
+        self.map_coords = Point(x, y)
 
 
 class Food:
@@ -51,17 +60,21 @@ class Snake:
             for y in range(len(self.driver.map)):
                 for x in range(len(self.driver.map[y])):
                     for block in self.driver.snake.blocks:
-                        if (x, y) == block.map_coords:
+                        if Point(x, y) == block.map_coords:
                             self.driver.map[y][x] = 0
 
             self.last_handled_vector = self.vector
             for index in reversed(range(1, len(self.blocks))):
-                x, y = self.blocks[index - 1].map_coords
-                self.blocks[index].map_coords = (x, y)
+                # x, y = self.blocks[index - 1].map_coords
+                # self.blocks[index].map_coords = (x, y)
+                self.blocks[index].map_coords = Point(self.blocks[index - 1].map_coords.x,
+                                                      self.blocks[index - 1].map_coords.y)
 
-            x, y = self.blocks[0].map_coords
-            self.blocks[0].map_coords = (x + self.vector.x,
-                                         y + self.vector.y)
+            x = self.blocks[0].map_coords.x
+            y = self.blocks[0].map_coords.y
+            # x, y = self.blocks[0].map_coords
+            self.blocks[0].map_coords = Point(x + self.vector.x,
+                                              y + self.vector.y)
 
     def check_obstacles(self):
         """Проверка встречи всевозможных препятствий при движении"""
@@ -84,42 +97,42 @@ class Snake:
                 self.driver.food.map_coords):
             if self.driver.food.type == 5:
                 self.blocks.append(
-                    Block(self.blocks[-1].map_coords[0],
-                          self.blocks[-1].map_coords[1]))
+                    Block(self.blocks[-1].map_coords.x,
+                          self.blocks[-1].map_coords.y))
                 self.driver.update_score(1)
             elif self.driver.food.type == 6:
                 for i in range(len(self.blocks)):
                     self.blocks.append(
-                        Block(self.blocks[-1].map_coords[0],
-                              self.blocks[-1].map_coords[1]))
+                        Block(self.blocks[-1].map_coords.x,
+                              self.blocks[-1].map_coords.y))
                 self.driver.update_score(self.driver.score)
             elif self.driver.food.type == 7:
                 self.driver.update_score(2)
                 self.driver.current_update_freq /= BOOST_COEFFICIENT
                 self.driver.boost_start_moment = time.perf_counter()
             elif self.driver.food.type == 8:
-                if (self.blocks[-1].map_coords[0] ==
-                        self.blocks[-2].map_coords[0] and
-                        self.blocks[-2].map_coords[1] ==
-                        self.blocks[-1].map_coords[1] - 1):
+                if (self.blocks[-1].map_coords.x ==
+                        self.blocks[-2].map_coords.x and
+                        self.blocks[-2].map_coords.y ==
+                        self.blocks[-1].map_coords.y - 1):
                     self.vector.y = 1
                     self.vector.x = 0
-                if (self.blocks[-1].map_coords[0] ==
-                        self.blocks[-2].map_coords[0] and
-                        self.blocks[-2].map_coords[1] ==
-                        self.blocks[-1].map_coords[1] + 1):
+                if (self.blocks[-1].map_coords.x ==
+                        self.blocks[-2].map_coords.x and
+                        self.blocks[-2].map_coords.y ==
+                        self.blocks[-1].map_coords.y + 1):
                     self.vector.y = -1
                     self.vector.x = 0
-                if (self.blocks[-1].map_coords[1] ==
-                        self.blocks[-2].map_coords[1] and
-                        self.blocks[-1].map_coords[0] ==
-                        self.blocks[-2].map_coords[0] - 1):
+                if (self.blocks[-1].map_coords.y ==
+                        self.blocks[-2].map_coords.y and
+                        self.blocks[-1].map_coords.x ==
+                        self.blocks[-2].map_coords.x - 1):
                     self.vector.y = 0
                     self.vector.x = -1
-                if (self.blocks[-1].map_coords[1] ==
-                        self.blocks[-2].map_coords[1] and
-                        self.blocks[-1].map_coords[0] ==
-                        self.blocks[-2].map_coords[0] + 1):
+                if (self.blocks[-1].map_coords.y ==
+                        self.blocks[-2].map_coords.y and
+                        self.blocks[-1].map_coords.x ==
+                        self.blocks[-2].map_coords.x + 1):
                     self.vector.y = 0
                     self.vector.x = 1
                 self.blocks.reverse()
@@ -139,19 +152,22 @@ class Snake:
 
         if self.driver.in_game:
             if int(self.driver.level) == 0:
-                if self.blocks[0].map_coords[0] > 39:
-                    self.blocks[0].map_coords = (0, self.blocks[0].map_coords[1])
-                if self.blocks[0].map_coords[0] < 0:
-                    self.blocks[0].map_coords = (39, self.blocks[0].map_coords[1])
-                if self.blocks[0].map_coords[1] > 29:
-                    self.blocks[0].map_coords = (self.blocks[0].map_coords[0], 0)
-                if self.blocks[0].map_coords[1] < 0:
-                    self.blocks[0].map_coords = (self.blocks[0].map_coords[0], 29)
+                if self.blocks[0].map_coords.x > 39:
+                    self.blocks[0].map_coords = Point(0, self.blocks[0].map_coords.y)
+                if self.blocks[0].map_coords.x < 0:
+                    self.blocks[0].map_coords = Point(39, self.blocks[0].map_coords.y)
+                if self.blocks[0].map_coords.y > 29:
+                    self.blocks[0].map_coords = Point(self.blocks[0].map_coords.x, 0)
+                if self.blocks[0].map_coords.y < 0:
+                    self.blocks[0].map_coords = Point(self.blocks[0].map_coords.x, 29)
             else:
-                if (self.blocks[0].map_coords[0] > 39 or
-                        self.blocks[0].map_coords[0] < 0 or
-                        self.blocks[0].map_coords[1] > 29 or
-                        self.blocks[0].map_coords[1] < 0):
+                if self.blocks[0].map_coords == Point(self.driver.teleport.start.x, self.driver.teleport.start.y):
+                    if self.driver.map[self.driver.teleport.end.y][self.driver.teleport.end.x + 1] == 0:
+                        self.blocks[0].map_coords = Point(self.driver.teleport.end.x + 1, self.driver.teleport.end.y)
+                if (self.blocks[0].map_coords.x > 39 or
+                        self.blocks[0].map_coords.x < 0 or
+                        self.blocks[0].map_coords.y > 29 or
+                        self.blocks[0].map_coords.y < 0):
                     self.driver.in_game = False
         if self.driver.level != 0 and self.hp > 0:
             for obstacle in self.driver.obstacles['walls']:

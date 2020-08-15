@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
 
 import time
-import snake_components
 import random
 import os
+from snake_components import Snake, Block, Food, Point
 from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
                     DEFAULT_FOOD_PROBABILITY,
                     DOUBLE_LENGTH_PROBABILITY,
                     BOOST_PROBABILITY,
                     REVERSE_PROBABILITY)
+from collections import namedtuple
+
+
+
+
+class Teleport:
+    def __init__(self, driver):
+        edges = driver.obstacles['edges']
+        start_end_indexes = random.sample(range(0, len(edges) - 1), 2)
+        self.start = Point(edges[start_end_indexes[0]].x, edges[start_end_indexes[0]].y)
+        self.end = Point(edges[start_end_indexes[1]].x, edges[start_end_indexes[1]].y)
+        driver.map[self.start.y][self.start.x] = 2
 
 
 class Driver:
@@ -26,12 +38,12 @@ class Driver:
         self.boost_start_moment = 0
         self.level = int(lvl)
         self.in_game = None
-        self.food = snake_components.Food()
+        self.food = Food()
         self.obstacles = self.create_level()
         if self.level != 0:
-            self.create_teleport()
+            self.teleport = Teleport(self)
         self.obstacles['snake_blocks'].reverse()
-        self.snake = snake_components.Snake(
+        self.snake = Snake(
             self.obstacles['snake_blocks'], self)
         self.food_types = {5: 'red', 6: 'green', 7: 'cyan', 8: 'purple'}
         if self.vanilla:
@@ -51,7 +63,7 @@ class Driver:
         block_coords = {}
         food_x = random.randint(1, BLOCK_SIZE * (WIDTH / BLOCK_SIZE ** 2) - 2)
         food_y = random.randint(1, BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2) - 2)
-        food_coords = (food_x, food_y)
+        food_coords = Point(food_x, food_y)
         index = 0
         for block in self.snake.blocks:
             block_coords[index] = block.map_coords
@@ -87,22 +99,22 @@ class Driver:
                         if (symbol == '5' or symbol == '6' or
                                 symbol == '7' or symbol == '8'):
                             self.map[y][x] = int(symbol)
-                            self.food.map_coords = (x, y)
+                            self.food.map_coords = Point(x, y)
                             self.food.type = int(symbol)
                         elif symbol == '9':
                             if (x != 0 and self.map[y][x - 1] == 0) or (y != 0 and self.map[y - 1][x] == 0):
-                                obstacles['edges'].append((x, y))
+                                obstacles['edges'].append(Point(x, y))
                             self.map[y][x] = 9
-                            obstacles['walls'].append((x, y))
+                            obstacles['walls'].append(Point(x, y))
                         elif symbol == '0':
-                            if y != 0 and self.map[y - 1][x] == 9 and (x, y - 1) not in obstacles['edges']:
-                                obstacles['edges'].append((x, y - 1))
-                            if x != 0 and self.map[y][x - 1] == 9 and (x - 1, y) not in obstacles['edges']:
-                                obstacles['edges'].append((x - 1, y))
+                            if y != 0 and self.map[y - 1][x] == 9 and Point(x, y - 1) not in obstacles['edges']:
+                                obstacles['edges'].append(Point(x, y - 1))
+                            if x != 0 and self.map[y][x - 1] == 9 and Point(x - 1, y) not in obstacles['edges']:
+                                obstacles['edges'].append(Point(x - 1, y))
                         elif symbol == '1':
                             self.map[y][x] = 1
                             obstacles['snake_blocks'].append(
-                                snake_components.Block(x, y))
+                                Block(x, y))
                         x += 1
                     y += 1
                     x = 0
@@ -110,12 +122,6 @@ class Driver:
         except FileNotFoundError or TypeError:
             self.in_game = False
         return obstacles
-
-    def create_teleport(self):
-        edge_number = random.randint(0, len(self.obstacles['edges']))
-        x = self.obstacles['edges'][edge_number][0]
-        y = self.obstacles['edges'][edge_number][1]
-        self.map[y][x] = 2
 
     def restart_the_game(self):
         """Перезапуск игры"""
@@ -128,11 +134,11 @@ class Driver:
         self.score = 0
         self.obstacles = self.create_level()
         self.obstacles['snake_blocks'].reverse()
-        self.snake = snake_components.Snake(
+        self.snake = Snake(
             self.obstacles['snake_blocks'], self)
         self.update_snake_state()
-        for wall in self.obstacles['walls']:
-            self.map[wall[1]][wall[0]] = 9
+        for wall_point in self.obstacles['walls']:
+            self.map[wall_point.y][wall_point.x] = 9
         if self.vanilla:
             self.get_food([5])
         else:
@@ -143,7 +149,7 @@ class Driver:
                                                   REVERSE_PROBABILITY]))
 
         if self.level != 0:
-            self.create_teleport()
+            self.teleport = Teleport(self)
         self.in_game = True
 
     def update_snake_state(self):
@@ -152,7 +158,7 @@ class Driver:
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 for block in self.snake.blocks:
-                    if (x, y) == block.map_coords:
+                    if Point(x, y) == block.map_coords:
                         self.map[y][x] = 1
         # for row in self.map:
         #     for elem in row:
