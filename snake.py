@@ -2,8 +2,8 @@
 
 import argparse
 import snake_engine
-import tkinter as tk
 import snake_components
+import tkinter as tk
 import os
 from config import BLOCK_SIZE, WIDTH, HEIGHT
 

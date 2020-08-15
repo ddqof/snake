@@ -3,23 +3,12 @@
 import time
 import random
 import os
-from snake_components import Snake, Block, Food, Point
+from snake_components import Snake, Block, Food, Point, Teleport
 from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
                     DEFAULT_FOOD_PROBABILITY,
                     DOUBLE_LENGTH_PROBABILITY,
                     BOOST_PROBABILITY,
                     REVERSE_PROBABILITY)
-
-
-class Teleport:
-    def __init__(self, driver):
-        edges = driver.obstacles['edges']
-        start_end_indexes = random.sample(range(0, len(edges) - 1), 2)
-        self.start = Point(edges[start_end_indexes[0]].x,
-                           edges[start_end_indexes[0]].y)
-        self.end = Point(edges[start_end_indexes[1]].x,
-                         edges[start_end_indexes[1]].y)
-        driver.map[self.start.y][self.start.x] = 2
 
 
 class Driver:
@@ -101,16 +90,16 @@ class Driver:
                             self.food.map_coords = Point(x, y)
                             self.food.type = int(symbol)
                         elif symbol == '9':
-                            if (x != 0 and self.map[y][x - 1] == 0) or\
+                            if (x != 0 and self.map[y][x - 1] == 0) or \
                                     (y != 0 and self.map[y - 1][x] == 0):
                                 obstacles['edges'].append(Point(x, y))
                             self.map[y][x] = 9
                             obstacles['walls'].append(Point(x, y))
                         elif symbol == '0':
-                            if y != 0 and self.map[y - 1][x] == 9 and\
+                            if y != 0 and self.map[y - 1][x] == 9 and \
                                     Point(x, y - 1) not in obstacles['edges']:
                                 obstacles['edges'].append(Point(x, y - 1))
-                            if x != 0 and self.map[y][x - 1] == 9 and\
+                            if x != 0 and self.map[y][x - 1] == 9 and \
                                     Point(x - 1, y) not in obstacles['edges']:
                                 obstacles['edges'].append(Point(x - 1, y))
                         elif symbol == '1':
@@ -162,11 +151,6 @@ class Driver:
                 for block in self.snake.blocks:
                     if Point(x, y) == block.map_coords:
                         self.map[y][x] = 1
-        # for row in self.map:
-        #     for elem in row:
-        #         print(elem, end=' ')
-        #     print()
-        # print()
 
     def update_score(self, score):
         """Обновление игровых очков"""
