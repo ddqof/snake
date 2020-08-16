@@ -11,6 +11,7 @@ from config import (DEFAULT_FOOD_PROBABILITY,
 
 
 class Teleport:
+    """Компонент «телепорт»"""
     def __init__(self, driver):
         edges = driver.obstacles['edges']
         start_end_indexes = random.sample(range(0, len(edges) - 1), 2)
@@ -22,6 +23,7 @@ class Teleport:
 
 
 class Point:
+    """Компонент «точка»"""
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -89,7 +91,7 @@ class Snake:
         """Проверка встречи всевозможных препятствий при движении"""
 
         self.check_self_eating()
-        self.check_eat()
+        self.check_food()
         self.check_walls()
 
     def check_self_eating(self):
@@ -99,7 +101,7 @@ class Snake:
             if self.blocks[0].map_coords == self.blocks[i].map_coords:
                 self.driver.in_game = False
 
-    def check_eat(self):
+    def check_food(self):
         """Обработка встречи еды"""
 
         if (self.blocks[0].map_coords ==
@@ -176,9 +178,15 @@ class Snake:
             else:
                 teleport = self.driver.teleport
                 if self.blocks[0].map_coords == Point(
-                        teleport.start.x, teleport.start.y):  # TODO: check index out of range in line below
+                        teleport.start.x, teleport.start.y):
+                    self.driver.update_score(2)
+                    self.hp += 1
+                    self.blocks.append(
+                        Block(self.blocks[-1].map_coords.x,
+                              self.blocks[-1].map_coords.y))
                     self.driver.map[teleport.start.y][teleport.start.x] = 9
-                    if self.driver.map[teleport.end.y][teleport.end.x + 1] == 0:
+                    if (teleport.end.x + 1 <= X_BORDER and
+                            self.driver.map[teleport.end.y][teleport.end.x + 1] == 0):
                         self.blocks[0].map_coords = \
                             Point(teleport.end.x + 1, teleport.end.y)
                         self.driver.snake.vector = Vector(1, 0)
@@ -186,7 +194,8 @@ class Snake:
                         self.blocks[0].map_coords = \
                             Point(teleport.end.x - 1, teleport.end.y)
                         self.driver.snake.vector = Vector(-1, 0)
-                    elif self.driver.map[teleport.end.y + 1][teleport.end.x] == 0:
+                    elif (teleport.end.y + 1 <= Y_BORDER and
+                            self.driver.map[teleport.end.y + 1][teleport.end.x] == 0):
                         self.blocks[0].map_coords = \
                             Point(teleport.end.x, teleport.end.y + 1)
                         self.driver.snake.vector = Vector(0, 1)
@@ -200,6 +209,7 @@ class Snake:
                         self.blocks[0].map_coords.y > Y_BORDER or
                         self.blocks[0].map_coords.y < 0):
                     self.driver.in_game = False
+                    self.hp = 0
         if len(self.driver.obstacles['edges']) > 0 and self.hp > 0:
             for obstacle in self.driver.obstacles['walls']:
                 if self.driver.snake.blocks[0].map_coords == obstacle:
