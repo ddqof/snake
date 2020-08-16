@@ -182,6 +182,18 @@ class SnakeInteractionsWithMap(unittest.TestCase):
                          self.engine.snake.vector)
         self.assertListEqual(expected, result)
 
+    def test_interact_with_borders_in_levels_with_edges(self):
+        level = os.path.join('.test_levels', 'teleport')
+        self.engine = snake_engine.Driver(level, None)
+        self.engine.snake.vector = snake_components.Vector(0, 1)
+        self.engine.snake.move()
+        self.engine.snake.vector = snake_components.Vector(-1, 0)
+        for i in range(11):
+            self.engine.snake.move()
+            self.engine.snake.check_walls()
+        self.assertFalse(self.engine.in_game)
+        self.assertEqual(0, self.engine.snake.hp)
+
 
 class DriverActions(unittest.TestCase):
 
@@ -220,7 +232,6 @@ class DriverActions(unittest.TestCase):
         self.engine.snake.check_walls()
         self.assertEqual(29, self.engine.snake.blocks[0].map_coords.y)
         self.assertEqual(1, self.engine.snake.blocks[0].map_coords.x)
-
 
     def test_restart_game(self):
         self.engine = snake_engine.Driver(1, None)
