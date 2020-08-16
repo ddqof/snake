@@ -185,6 +185,43 @@ class SnakeInteractionsWithMap(unittest.TestCase):
 
 class DriverActions(unittest.TestCase):
 
+    def test_teleport_create(self):
+        self.engine = snake_engine.Driver(1, None)
+        self.assertTrue(type(self.engine.teleport.start) is Point)
+        self.assertTrue(type(self.engine.teleport.end) is Point)
+
+    def test_teleport_features(self):
+        level = os.path.join('.test_levels', 'teleport')
+        self.engine = snake_engine.Driver(level, None)
+        self.assertTrue(
+            Point(12, 13) in self.engine.obstacles['edges'] and Point(0, 19) in self.engine.obstacles['edges'])
+        for i in range(3):
+            self.engine.snake.move()
+
+    def test_teleport_in_empty_map(self):
+        level = os.path.join('.test_levels', 'empty_map')
+        self.engine = snake_engine.Driver(level, None)
+        self.engine.snake.vector = snake_components.Vector(1, 0)
+        for i in range(2):
+            self.engine.snake.move()
+            self.engine.snake.check_walls()
+        self.assertEqual(0, self.engine.snake.blocks[0].map_coords.x)
+        self.assertEqual(13, self.engine.snake.blocks[0].map_coords.y)
+        self.engine.snake.vector = snake_components.Vector(0, 1)
+        for i in range(17):
+            self.engine.snake.move()
+            self.engine.snake.check_walls()
+        self.assertEqual(0, self.engine.snake.blocks[0].map_coords.x)
+        self.assertEqual(0, self.engine.snake.blocks[0].map_coords.y)
+        self.engine.snake.vector = snake_components.Vector(1, 0)
+        self.engine.snake.move()
+        self.engine.snake.vector = snake_components.Vector(0, -1)
+        self.engine.snake.move()
+        self.engine.snake.check_walls()
+        self.assertEqual(29, self.engine.snake.blocks[0].map_coords.y)
+        self.assertEqual(1, self.engine.snake.blocks[0].map_coords.x)
+
+
     def test_restart_game(self):
         self.engine = snake_engine.Driver(1, None)
         self.engine.snake.vector = snake_components.Vector(0, -1)

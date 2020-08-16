@@ -14,8 +14,8 @@ from config import (SNAKE_SPEED, BLOCK_SIZE, WIDTH, HEIGHT,
 class Driver:
     """Компонент «контроллер игры»"""
 
-    def __init__(self, lvl, food_flag):
-        self.vanilla = food_flag
+    def __init__(self, lvl, vanilla_flag):
+        self.vanilla = vanilla_flag
         self.map = []
         for y in range(int(BLOCK_SIZE * (HEIGHT / BLOCK_SIZE ** 2))):
             self.map.append([])

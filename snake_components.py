@@ -14,7 +14,7 @@ class Teleport:
     """Компонент «телепорт»"""
     def __init__(self, driver):
         edges = driver.obstacles['edges']
-        start_end_indexes = random.sample(range(0, len(edges) - 1), 2)
+        start_end_indexes = random.sample(range(0, len(edges)), 2)
         self.start = Point(edges[start_end_indexes[0]].x,
                            edges[start_end_indexes[0]].y)
         self.end = Point(edges[start_end_indexes[1]].x,
