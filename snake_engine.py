@@ -24,11 +24,11 @@ class Driver:
         self.default_update_freq = int(1 / SNAKE_SPEED * 1000)
         self.current_update_freq = self.default_update_freq
         self.boost_start_moment = 0
-        self.level = int(lvl)
+        self.level = lvl
         self.in_game = None
         self.food = Food()
         self.obstacles = self.create_level()
-        if self.level != 0:
+        if len(self.obstacles['edges']) > 0:
             self.teleport = Teleport(self)
         self.obstacles['snake_blocks'].reverse()
         self.snake = Snake(
@@ -139,7 +139,7 @@ class Driver:
                                                   BOOST_PROBABILITY,
                                                   REVERSE_PROBABILITY]))
 
-        if self.level != 0:
+        if len(self.obstacles['edges']) > 0:
             self.teleport = Teleport(self)
         self.in_game = True
 

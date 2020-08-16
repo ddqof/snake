@@ -6,7 +6,9 @@ from config import (DEFAULT_FOOD_PROBABILITY,
                     DOUBLE_LENGTH_PROBABILITY,
                     BOOST_PROBABILITY,
                     BOOST_COEFFICIENT,
-                    REVERSE_PROBABILITY)
+                    REVERSE_PROBABILITY,
+                    X_BORDER, Y_BORDER)
+
 
 class Teleport:
     def __init__(self, driver):
@@ -158,47 +160,47 @@ class Snake:
         """Проверка на столкновение змейки со стеной"""
 
         if self.driver.in_game:
-            if int(self.driver.level) == 0:
-                if self.blocks[0].map_coords.x > 39:
-                    self.blocks[0].map_coords =\
+            if len(self.driver.obstacles['edges']) == 0:
+                if self.blocks[0].map_coords.x > X_BORDER:
+                    self.blocks[0].map_coords = \
                         Point(0, self.blocks[0].map_coords.y)
                 if self.blocks[0].map_coords.x < 0:
-                    self.blocks[0].map_coords =\
-                        Point(39, self.blocks[0].map_coords.y)
-                if self.blocks[0].map_coords.y > 29:
-                    self.blocks[0].map_coords =\
+                    self.blocks[0].map_coords = \
+                        Point(X_BORDER, self.blocks[0].map_coords.y)
+                if self.blocks[0].map_coords.y > Y_BORDER:
+                    self.blocks[0].map_coords = \
                         Point(self.blocks[0].map_coords.x, 0)
                 if self.blocks[0].map_coords.y < 0:
-                    self.blocks[0].map_coords =\
-                        Point(self.blocks[0].map_coords.x, 29)
+                    self.blocks[0].map_coords = \
+                        Point(self.blocks[0].map_coords.x, Y_BORDER)
             else:
                 teleport = self.driver.teleport
                 if self.blocks[0].map_coords == Point(
-                        teleport.start.x, teleport.start.y):
+                        teleport.start.x, teleport.start.y):  # TODO: check index out of range in line below
                     self.driver.map[teleport.start.y][teleport.start.x] = 9
                     if self.driver.map[teleport.end.y][teleport.end.x + 1] == 0:
-                        self.blocks[0].map_coords =\
+                        self.blocks[0].map_coords = \
                             Point(teleport.end.x + 1, teleport.end.y)
                         self.driver.snake.vector = Vector(1, 0)
                     elif self.driver.map[teleport.end.y][teleport.end.x - 1] == 0:
-                        self.blocks[0].map_coords =\
+                        self.blocks[0].map_coords = \
                             Point(teleport.end.x - 1, teleport.end.y)
                         self.driver.snake.vector = Vector(-1, 0)
                     elif self.driver.map[teleport.end.y + 1][teleport.end.x] == 0:
-                        self.blocks[0].map_coords =\
+                        self.blocks[0].map_coords = \
                             Point(teleport.end.x, teleport.end.y + 1)
                         self.driver.snake.vector = Vector(0, 1)
                     elif self.driver.map[teleport.end.y - 1][teleport.end.x] == 0:
-                        self.blocks[0].map_coords =\
+                        self.blocks[0].map_coords = \
                             Point(teleport.end.x, teleport.end.y - 1)
                         self.driver.snake.vector = Vector(0, -1)
                     self.driver.teleport = Teleport(self.driver)
-                if (self.blocks[0].map_coords.x > 39 or
+                if (self.blocks[0].map_coords.x > X_BORDER or
                         self.blocks[0].map_coords.x < 0 or
-                        self.blocks[0].map_coords.y > 29 or
+                        self.blocks[0].map_coords.y > Y_BORDER or
                         self.blocks[0].map_coords.y < 0):
                     self.driver.in_game = False
-        if self.driver.level != 0 and self.hp > 0:
+        if len(self.driver.obstacles['edges']) > 0 and self.hp > 0:
             for obstacle in self.driver.obstacles['walls']:
                 if self.driver.snake.blocks[0].map_coords == obstacle:
                     self.hp -= 1

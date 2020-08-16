@@ -4,6 +4,7 @@ import unittest
 import snake_engine
 import snake_components
 import os
+from snake_components import Point
 
 
 class SnakeMove(unittest.TestCase):
@@ -22,25 +23,25 @@ class SnakeMove(unittest.TestCase):
     def test_move_right_for_one_block(self):
         self.engine.snake.vector = snake_components.Vector(1, 0)
         result = self.move_and_get_snake_coords(1)
-        expected = [(11, 13), (10, 13), (9, 13), (8, 13), (7, 13), (6, 13)]
+        expected = [Point(11, 13), Point(10, 13), Point(9, 13), Point(8, 13), Point(7, 13), Point(6, 13)]
         self.assertListEqual(expected, result)
 
     def test_move_up_for_one_block(self):
         self.engine.snake.vector = snake_components.Vector(0, -1)
         result = self.move_and_get_snake_coords(1)
-        expected = [(10, 12), (10, 13), (9, 13), (8, 13), (7, 13), (6, 13)]
+        expected = [Point(10, 12), Point(10, 13), Point(9, 13), Point(8, 13), Point(7, 13), Point(6, 13)]
         self.assertListEqual(expected, result)
 
     def test_move_down_for_one_block(self):
         self.engine.snake.vector = snake_components.Vector(0, 1)
         result = self.move_and_get_snake_coords(1)
-        expected = [(10, 14), (10, 13), (9, 13), (8, 13), (7, 13), (6, 13)]
+        expected = [Point(10, 14), Point(10, 13), Point(9, 13), Point(8, 13), Point(7, 13), Point(6, 13)]
         self.assertListEqual(expected, result)
 
     def test_move_down_for_three_blocks(self):
         self.engine.snake.vector = snake_components.Vector(0, 1)
         result = self.move_and_get_snake_coords(3)
-        expected = [(10, 16), (10, 15), (10, 14), (10, 13), (9, 13), (8, 13)]
+        expected = [Point(10, 16), Point(10, 15), Point(10, 14), Point(10, 13), Point(9, 13), Point(8, 13)]
         self.assertListEqual(expected, result)
 
     def test_difficult_path(self):
@@ -55,11 +56,11 @@ class SnakeMove(unittest.TestCase):
         self.engine.snake.vector = snake_components.Vector(0, -1)
         self.engine.snake.move()
         result = self.move_and_get_snake_coords(0)
-        expected = [(12, 12), (12, 13), (11, 13), (11, 14), (10, 14), (10, 13)]
+        expected = [Point(12, 12), Point(12, 13), Point(11, 13), Point(11, 14), Point(10, 14), Point(10, 13)]
         self.assertListEqual(expected, result)
         self.engine.snake.vector = snake_components.Vector(-1, 0)
         result = self.move_and_get_snake_coords(4)
-        expected = [(8, 12), (9, 12), (10, 12), (11, 12), (12, 12), (12, 13)]
+        expected = [Point(8, 12), Point(9, 12), Point(10, 12), Point(11, 12), Point(12, 12), Point(12, 13)]
         self.assertListEqual(expected, result)
 
     def test_bounds(self):
@@ -70,11 +71,11 @@ class SnakeMove(unittest.TestCase):
             self.engine.snake.move()
         self.engine.snake.check_walls()
         result = self.move_and_get_snake_coords(0)
-        expected = [(39, 12), (0, 12), (1, 12), (2, 12), (3, 12), (4, 12)]
+        expected = [Point(39, 12), Point(0, 12), Point(1, 12), Point(2, 12), Point(3, 12), Point(4, 12)]
         self.assertTrue(self.engine.in_game)
         self.assertListEqual(expected, result)
         result = self.move_and_get_snake_coords(1)
-        expected = [(38, 12), (39, 12), (0, 12), (1, 12), (2, 12), (3, 12)]
+        expected = [Point(38, 12), Point(39, 12), Point(0, 12), Point(1, 12), Point(2, 12), Point(3, 12)]
         self.assertListEqual(expected, result)
 
     def test_self_eating(self):
@@ -84,7 +85,7 @@ class SnakeMove(unittest.TestCase):
         self.engine.snake.move()
         self.engine.snake.vector = snake_components.Vector(0, -1)
         result = self.move_and_get_snake_coords(1)
-        expected = [(9, 13), (9, 14), (10, 14), (10, 13), (9, 13), (8, 13)]
+        expected = [Point(9, 13), Point(9, 14), Point(10, 14), Point(10, 13), Point(9, 13), Point(8, 13)]
         self.engine.snake.check_self_eating()
         self.assertFalse(self.engine.in_game)
         self.assertListEqual(expected, result)
@@ -109,8 +110,8 @@ class SnakeInteractionsWithMap(unittest.TestCase):
         self.engine.snake.move()
         self.engine.snake.check_eat()
         result = self.move_and_get_snake_coords(1)
-        expected = [(12, 13), (11, 13), (10, 13), (9, 13),
-                    (8, 13), (7, 13), (6, 13)]
+        expected = [Point(12, 13), Point(11, 13), Point(10, 13), Point(9, 13),
+                    Point(8, 13), Point(7, 13), Point(6, 13)]
         self.assertEqual(self.engine.score, 1)
         self.assertEqual(len(expected), len(result))
         self.assertListEqual(expected, result)
@@ -122,9 +123,9 @@ class SnakeInteractionsWithMap(unittest.TestCase):
         self.engine.snake.move()
         self.engine.snake.check_eat()
         result = self.move_and_get_snake_coords(7)
-        expected = [(18, 13), (17, 13), (16, 13), (15, 13),
-                    (14, 13), (13, 13), (12, 13), (11, 13),
-                    (10, 13), (9, 13), (8, 13), (7, 13)]
+        expected = [Point(18, 13), Point(17, 13), Point(16, 13), Point(15, 13),
+                    Point(14, 13), Point(13, 13), Point(12, 13), Point(11, 13),
+                    Point(10, 13), Point(9, 13), Point(8, 13), Point(7, 13)]
         self.assertEqual(len(expected), len(result))
         self.assertListEqual(expected, result)
 
@@ -135,7 +136,7 @@ class SnakeInteractionsWithMap(unittest.TestCase):
         self.engine.snake.move()
         self.engine.snake.check_eat()
         result = self.move_and_get_snake_coords(1)
-        expected = [(5, 13), (6, 13), (7, 13), (8, 13), (9, 13), (10, 13)]
+        expected = [Point(5, 13), Point(6, 13), Point(7, 13), Point(8, 13), Point(9, 13), Point(10, 13)]
         self.assertEqual(snake_components.Vector(-1, 0),
                          self.engine.snake.vector)
         self.assertListEqual(expected, result)
@@ -150,7 +151,7 @@ class SnakeInteractionsWithMap(unittest.TestCase):
             self.engine.snake.move()
         self.engine.snake.check_eat()
         result = self.move_and_get_snake_coords(2)
-        expected = [(11, 14), (10, 14), (9, 14), (8, 14), (7, 14), (6, 14)]
+        expected = [Point(11, 14), Point(10, 14), Point(9, 14), Point(8, 14), Point(7, 14), Point(6, 14)]
         self.assertEqual(snake_components.Vector(1, 0),
                          self.engine.snake.vector)
         self.assertListEqual(expected, result)
@@ -163,7 +164,7 @@ class SnakeInteractionsWithMap(unittest.TestCase):
             self.engine.snake.move()
         self.engine.snake.check_eat()
         result = self.move_and_get_snake_coords(2)
-        expected = [(10, 13), (10, 14), (10, 15), (10, 16), (10, 17), (10, 18)]
+        expected = [Point(10, 13), Point(10, 14), Point(10, 15), Point(10, 16), Point(10, 17), Point(10, 18)]
         self.assertEqual(snake_components.Vector(0, -1),
                          self.engine.snake.vector)
         self.assertListEqual(expected, result)
@@ -176,7 +177,7 @@ class SnakeInteractionsWithMap(unittest.TestCase):
             self.engine.snake.move()
         self.engine.snake.check_eat()
         result = self.move_and_get_snake_coords(2)
-        expected = [(10, 13), (10, 12), (10, 11), (10, 10), (10, 9), (10, 8)]
+        expected = [Point(10, 13), Point(10, 12), Point(10, 11), Point(10, 10), Point(10, 9), Point(10, 8)]
         self.assertEqual(snake_components.Vector(0, 1),
                          self.engine.snake.vector)
         self.assertListEqual(expected, result)
@@ -198,7 +199,7 @@ class DriverActions(unittest.TestCase):
         self.assertTrue(self.engine.in_game)
         self.assertIsNotNone(self.engine.food.type)
         self.assertIsNotNone(self.engine.food.map_coords)
-        self.assertListEqual([(2, 14), (1, 14), (0, 14)], snake_coords)
+        self.assertListEqual([Point(2, 14), Point(1, 14), Point(0, 14)], snake_coords)
 
     def test_create_level(self):
         self.engine = snake_engine.Driver(0, None)
