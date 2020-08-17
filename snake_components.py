@@ -87,13 +87,6 @@ class Snake:
             self.blocks[0].map_coords = Point(x + self.vector.x,
                                               y + self.vector.y)
 
-    def check_obstacles(self):
-        """Проверка встречи всевозможных препятствий при движении"""
-
-        self.check_self_eating()
-        self.check_food()
-        self.check_walls()
-
     def check_self_eating(self):
         """Проверка столкновения змейки с самой собой"""
 
@@ -179,7 +172,7 @@ class Snake:
                 teleport = self.driver.teleport
                 if self.blocks[0].map_coords == Point(
                         teleport.start.x, teleport.start.y):
-                    self.driver.update_score(2)
+                    self.driver.update_score(5)
                     self.hp += 1
                     self.blocks.append(
                         Block(self.blocks[-1].map_coords.x,

@@ -93,7 +93,9 @@ class Canvas(tk.Canvas):
 
         self.driver.snake.move()
         self.driver.update_snake_state()
-        self.driver.snake.check_obstacles()
+        self.driver.snake.check_self_eating()
+        self.driver.snake.check_food()
+        self.driver.snake.check_walls()
         self.driver.check_boost_time()
         self.update_canvas()
         self.root.after(int(self.driver.current_update_freq), self.play)
