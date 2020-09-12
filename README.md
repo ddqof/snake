@@ -16,7 +16,7 @@
 
 ## Запуск приложения
 * Пример запуска на Windows: `snake.py`
-* Пример запуска на \*nix-like системах: `./snake.py`
+* Пример запуска на unix-like системах: `./snake.py`
 * Запуск Vanilla версии: `snake.py -v`
 * Запуск `n`-го уровня: `snake.py -lvl n`
 
